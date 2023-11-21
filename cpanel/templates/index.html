@@ -19,7 +19,11 @@
                     <li><a href="/members/">부원관리</a></li>
                     <li><a href="/money/">회비관리</a></li>
                     <li><a href="/calendar/">일정관리</a></li>
+                {% if request.session.uid %}
+                    <li><a href="/logout/">로그아웃</a></li>
+                {% else %}
                     <li><a href="/signIn/">로그인</a></li>
+                {% endif %}
                 </ul>
             </nav>
         </header>

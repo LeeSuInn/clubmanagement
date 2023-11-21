@@ -21,18 +21,14 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index),
-    path('signIn/', views.signIn),
-    path('index/', views.index),
-    path('postsign/', views.postsign),
-    path('logout/', views.logout, name="log"),
-    path('signup/', views.signUp, name="signup"),
-    path('postsignup/', views.postsignup, name="postsignup"),
+    path('signIn/', views.signIn, name ='login'),
+    path('index/', views.index, name ="index"),
+    path('postsign/', views.postsign, name ='postsign'),
     path('create/', views.create, name="create"),
     path('post_create/', views.post_create, name="post_create"),
     path('members/', views.members, name="members"),
     path('money/', views.money, name="money"),
     path('calendar/', views.calendar, name="calendar"),
-    path('#myMoeal/', views.login, name="login")
-
+    path('logout/', views.logout_view, name='logout')
 
 ]

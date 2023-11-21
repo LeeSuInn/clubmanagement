@@ -1,17 +1,21 @@
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponseRedirect
+from django.urls import reverse
 import pyrebase
 from django.contrib import auth
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
+
 
 #firebase 프로젝트 정보
 config ={
-    'apiKey': "AIzaSyBeASXHeG_7HenOkXp7rQywcDnRJvUWTnQ",
-    'authDomain': "club-management-9de69.firebaseapp.com",
-    'projectId': "club-management-9de69",
-    'storageBucket': "club-management-9de69.appspot.com",
-    'messagingSenderId': "416716702165",
-    'appId': "1:416716702165:web:4061875947e34420e83d5c",
-    'measurementId': "G-0JZL92PKZ8",
-    'databaseURL': "https://club-management-9de69-default-rtdb.firebaseio.com/"
+    'apiKey': "AIzaSyCKBN_w-mQNi1B0EIvIwOghr7y5afSkIb4",
+    'authDomain': "club-management-system-bc814.firebaseapp.com",
+    'projectId': "club-management-system-bc814",
+    'storageBucket': "club-management-system-bc814.appspot.com",
+    'messagingSenderId': "99652543260",
+    'appId': "1:99652543260:web:d17e2bb697763a947950d9",
+    'measurementId': "G-Z5R49455MZ",    
+    'databaseURL': "https://club-management-system-bc814-default-rtdb.firebaseio.com/"
 }
 
 #firebase 연동
@@ -23,7 +27,7 @@ database = firebase.database()
 
 #로그인 페이지 출력
 def index(request):
-    return render(request,"index.html")
+        return render(request, "index.html")
 
 def signIn(request):
     return render(request, "signIn.html")
@@ -42,14 +46,14 @@ def postsign(request):
     #로그인 정보를 계속해서 유지하기 위해 FIREBASE에서 제공하는 ID Token을 django 섹션에 저장하는 것이다.
     session_id=user['idToken']
     request.session['uid'] = str(session_id)
-    return render(request,"welcome.html", {"e":email})  #welcome 화면 출력하면서 email 전송
+    return HttpResponseRedirect(reverse('index'))
 
 def logout(request):
     try:
         del request.session['uid']   #django의 로그아웃 함수
     except KeyError:
         pass
-    return render(request, "signIn.html")   #signIn 화면 다시 출력
+    return render(request, "index.html")   #signIn 화면 다시 출력
 
 #회원가입 페이지
 def signUp(request):
@@ -108,13 +112,27 @@ def post_create(request):
         return render(request, "signIn.html",{"messg": message})
     
 def members(request):
+    if 'uid' not in request.session:
+        message = "login please." #틀린 정보일 때 경고 메세지
+        return render(request, "signIn.html", {"messg":message})
+
     return render(request, "members.html")
 
 def money(request):
+    if 'uid' not in request.session:
+        message = "login please." #틀린 정보일 때 경고 메세지
+        return render(request, "signIn.html", {"messg":message})
+
     return render(request, "money.html")
 
+
 def calendar(request):
+    if 'uid' not in request.session:
+        message = "login please." #틀린 정보일 때 경고 메세지
+        return render(request, "signIn.html", {"messg":message})
+    
     return render(request, "calendar.html")
 
-def login(request):
-    return render(request, "login_modal.html")
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect(reverse('index'))
