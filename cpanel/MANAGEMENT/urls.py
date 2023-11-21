@@ -17,18 +17,23 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from . import views
+from log import views as logview
+from members import views   as membersview
+from money import views as moneyview
+from schedule import views as scheduleview
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index),
-    path('signIn/', views.signIn, name ='login'),
+    path('signIn/', logview.signIn, name ='login'),
     path('index/', views.index, name ="index"),
-    path('postsign/', views.postsign, name ='postsign'),
+    path('postsign/', logview.postsign, name ='postsign'),
     path('create/', views.create, name="create"),
     path('post_create/', views.post_create, name="post_create"),
-    path('members/', views.members, name="members"),
-    path('money/', views.money, name="money"),
-    path('calendar/', views.calendar, name="calendar"),
-    path('logout/', views.logout_view, name='logout')
+    path('members/', membersview.members, name="members"),
+    path('money/', moneyview.money, name="money"),
+    path('calendar/', scheduleview.calendar, name="calendar"),
+    path('logout/', logview.logout_view, name='logout')
 
 ]

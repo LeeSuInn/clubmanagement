@@ -29,32 +29,6 @@ database = firebase.database()
 def index(request):
         return render(request, "index.html")
 
-def signIn(request):
-    return render(request, "signIn.html")
-
-#로그인 함수
-def postsign(request):
-    #email과 password를 받는다.
-    email=request.POST.get('email')
-    passw=request.POST.get('pass')
-    try:
-        user = authe.sign_in_with_email_and_password(email, passw)  #firebase의 authe API를 사용하여 로그인 정보 확인
-    except:
-        message = "invalid credentials" #틀린 정보일 때 경고 메세지
-        return render(request, "signIn.html", {"messg":message})    #signIn 화면 출력하면서 메세지 전송
-
-    #로그인 정보를 계속해서 유지하기 위해 FIREBASE에서 제공하는 ID Token을 django 섹션에 저장하는 것이다.
-    session_id=user['idToken']
-    request.session['uid'] = str(session_id)
-    return HttpResponseRedirect(reverse('index'))
-
-def logout(request):
-    try:
-        del request.session['uid']   #django의 로그아웃 함수
-    except KeyError:
-        pass
-    return render(request, "index.html")   #signIn 화면 다시 출력
-
 #회원가입 페이지
 def signUp(request):
     return render(request, "signup.html")
@@ -111,28 +85,3 @@ def post_create(request):
         message = "Oops! User Logged out Please SignIn Again"
         return render(request, "signIn.html",{"messg": message})
     
-def members(request):
-    if 'uid' not in request.session:
-        message = "login please." #틀린 정보일 때 경고 메세지
-        return render(request, "signIn.html", {"messg":message})
-
-    return render(request, "members.html")
-
-def money(request):
-    if 'uid' not in request.session:
-        message = "login please." #틀린 정보일 때 경고 메세지
-        return render(request, "signIn.html", {"messg":message})
-
-    return render(request, "money.html")
-
-
-def calendar(request):
-    if 'uid' not in request.session:
-        message = "login please." #틀린 정보일 때 경고 메세지
-        return render(request, "signIn.html", {"messg":message})
-    
-    return render(request, "calendar.html")
-
-def logout_view(request):
-    logout(request)
-    return HttpResponseRedirect(reverse('index'))
