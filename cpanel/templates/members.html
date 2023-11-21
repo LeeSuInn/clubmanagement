@@ -1,0 +1,93 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+        #editButton {
+            float: right;
+            margin-top: -50px;
+            margin-right: 20px; 
+            cursor: pointer;
+        }
+
+    </style>
+    <title>동아리통합시스템</title>
+</head>
+<body>
+    <header>
+        <div class="logo">로고</div>
+        <nav>
+            <ul>
+                <li><a href="/index/">동아리통합시스템</a></li>
+                <li><a href="/members/">부원관리</a></li>
+                <li><a href="/money/">회비관리</a></li>
+                <li><a href="/calendar/">일정관리</a></li>
+                <li><a href="#  myModal" id="loginBtn">로그인</a></li>
+            </ul>
+        </nav>
+    </header>
+    <h2>부원 목록</h2>
+
+    <button id="editButton">수정하기</button>
+
+    <table id="memberTable">
+        <thead>
+            <tr>
+                <th>이름</th>
+                <th>가입 날짜</th>
+                <th>학번</th>
+                <th>전화번호</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- 테이블의 내용이 동적으로 추가될 부분 -->
+        </tbody>
+    </table>
+    <script>
+       
+        var data = [
+            { name: '김', date: '6월 3일', number: '60182500', phone: '01012345678'},
+            { name: '이', date: '4월 5일', number: '60182504', phone: '01098765432'},
+        ];
+
+        // 테이블에 데이터 동적으로 추가
+        var tableBody = document.querySelector('#memberTable tbody');
+
+        data.forEach(function (member) {
+            var row = tableBody.insertRow();
+            var cell1 = row.insertCell(0);
+            var cell2 = row.insertCell(1);
+            var cell3 = row.insertCell(2);
+            var cell4 = row.insertCell(3);
+            
+
+            cell1.textContent = member.name;
+            cell2.textContent = member.date;
+            cell3.textContent = member.number;
+            cell4.textContent = member.phone;
+
+            var editButton = document.createElement('button');
+            editButton.textContent = '수정하기';
+            editButton.className = 'edit-button';
+
+        });
+    </script>
+</body>
+</html>
