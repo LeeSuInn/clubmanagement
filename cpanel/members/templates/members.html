@@ -52,51 +52,76 @@
             </ul>
         </nav>
     </header>
+
     <h2>부원 목록</h2>
 
     <button id="editButton">수정하기</button>
-
-    <table id="memberTable">
-        <thead>
-            <tr>
-                <th>이름</th>
-                <th>가입 날짜</th>
-                <th>학번</th>
-                <th>전화번호</th>
-            </tr>
-        </thead>
         <tbody>
             <!-- 테이블의 내용이 동적으로 추가될 부분 -->
+            {% if request.session.uid %}            
+            <table id="data-table">
+                <thead>
+                    <tr>
+                        <th>학번</th>
+                        <th>이름</th>
+                        <th>전화번호</th>
+                        <th>이메일</th>
+                        <th>직책</th>
+                        <!-- 다른 필요한 열들을 추가할 수 있습니다. -->
+                    </tr>
+                </thead>
+                <tbody id="data-body">
+                    <!-- 데이터가 여기에 동적으로 추가될 것입니다. -->
+                </tbody>
+            </table>
+            
+            <script>
+            function fetchData() {
+                fetch('/get_data/')  // Django 프로젝트에 맞게 URL 조정
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            displayData(data.data);
+                        } else {
+                            displayError(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('데이터 가져오는 중 오류 발생:', error);
+                        displayError('데이터를 가져오는 중 오류가 발생했습니다.');
+                    });
+            }
+            
+            function displayData(data) {
+                var tbody = document.getElementById('data-body');
+            
+                // 표에 있는 기존 데이터를 지웁니다.
+                tbody.innerHTML = '';
+            
+                // 표에 각 부원의 정보를 새로운 행으로 추가합니다.
+                data.forEach(member => {
+                    var row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${member.학번}</td>
+                        <td>${member.이름}</td>
+                        <td>${member.전화번호}</td>
+                        <td>${member.이메일}</td>
+                        <td>${member.직책}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+            
+            function displayError(message) {
+                // 필요하다면 오류 표시를 처리합니다.
+            }
+            
+            // 페이지 로드 시 fetchData 함수 호출
+            document.addEventListener('DOMContentLoaded', fetchData);
+            </script>
+            {% endif %}
+
         </tbody>
     </table>
-    <script>
-       
-        var data = [
-            { name: '김', date: '6월 3일', number: '60182500', phone: '01012345678'},
-            { name: '이', date: '4월 5일', number: '60182504', phone: '01098765432'},
-        ];
-
-        // 테이블에 데이터 동적으로 추가
-        var tableBody = document.querySelector('#memberTable tbody');
-
-        data.forEach(function (member) {
-            var row = tableBody.insertRow();
-            var cell1 = row.insertCell(0);
-            var cell2 = row.insertCell(1);
-            var cell3 = row.insertCell(2);
-            var cell4 = row.insertCell(3);
-            
-
-            cell1.textContent = member.name;
-            cell2.textContent = member.date;
-            cell3.textContent = member.number;
-            cell4.textContent = member.phone;
-
-            var editButton = document.createElement('button');
-            editButton.textContent = '수정하기';
-            editButton.className = 'edit-button';
-
-        });
-    </script>
 </body>
 </html>

@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 from pathlib import Path
+import firebase_admin
+from firebase_admin import credentials
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,7 +44,8 @@ INSTALLED_APPS = [
     'members',
     'log',
     'money',
-    'schedule'
+    'schedule',
+    'MANAGEMENT'
 ]
 
 MIDDLEWARE = [
@@ -127,3 +131,9 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# 서비스 계정 키 파일의 경로를 지정합니다.
+cred = credentials.Certificate("C:\\Users\\0801p\\Downloads\\club-management-system-bc814-firebase-adminsdk-eq3zf-6e517d78b5.json")
+
+# Firebase Admin SDK 초기화
+firebase_admin.initialize_app(cred)

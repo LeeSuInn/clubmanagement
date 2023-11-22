@@ -1,6 +1,8 @@
 from django.shortcuts import render, HttpResponseRedirect
 from django.urls import reverse
 import pyrebase
+import jwt
+
 
 #firebase 프로젝트 정보
 config ={
@@ -38,7 +40,8 @@ def postsign(request):
 
     #로그인 정보를 계속해서 유지하기 위해 FIREBASE에서 제공하는 ID Token을 django 섹션에 저장하는 것이다.
     session_id=user['idToken']
-    request.session['uid'] = str(session_id)
+    uid = extract_uid_from_id_token(session_id)
+    request.session['uid'] = str(uid)
     return HttpResponseRedirect(reverse('index'))
 
 def logout(request):
@@ -51,4 +54,26 @@ def logout(request):
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse('index'))
+
+#UID 추출 및 세션에 저장하는 Django 코드
+def extract_uid_from_id_token(id_token):
+    try:
+        # Firebase에서 발급한 JWT 디코딩
+        decoded_token = jwt.decode(id_token, options={"verify_signature": False}, algorithms=["RS256"])
+
+        # UID 추출
+        uid = decoded_token.get('user_id') or decoded_token.get('sub')
+
+        return uid
+    
+    except jwt.ExpiredSignatureError:
+        # 토큰의 유효 기간이 만료된 경우
+        print("Token has expired.")
+        return None
+
+    except jwt.InvalidTokenError as e:
+        # 유효하지 않은 토큰인 경우
+        print(f"Invalid token: {e}")
+        return None
+
 

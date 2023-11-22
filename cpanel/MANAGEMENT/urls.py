@@ -34,6 +34,7 @@ urlpatterns = [
     path('members/', membersview.members, name="members"),
     path('money/', moneyview.money, name="money"),
     path('calendar/', scheduleview.calendar, name="calendar"),
-    path('logout/', logview.logout_view, name='logout')
-
+    path('logout/', logview.logout_view, name='logout'),
+    path('get_data/', membersview.get_data, name='get_data'),
+    path('your_view/', views.your_view, name ="your_view")
 ]

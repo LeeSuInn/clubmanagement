@@ -15,7 +15,11 @@
             <div class="logo">로고</div>
             <nav>
                 <ul>
+                {% if request.session.uid %}
+                    <li><a href="/your_view/">동아리통합시스템</a></li>
+                {% else %}
                     <li><a href="/index/">동아리통합시스템</a></li>
+                {% endif %}
                     <li><a href="/members/">부원관리</a></li>
                     <li><a href="/money/">회비관리</a></li>
                     <li><a href="/calendar/">일정관리</a></li>
@@ -27,22 +31,13 @@
                 </ul>
             </nav>
         </header>
-                <main>
-            <!--모달-->
-            <div id="myModal"class="modal">
-                <div class="modal-content">
-                    <span class="close">&times;</span>
-                    <h2>로그인</h2>
-                    <form id="loginForm">
-                        <label for="username">아이디:</label>
-                        <input type="text" id="username" name="username" required />
+        <main>
+            {% if request.session.uid %}
+            <h2>{{CLUBNAME}}입니다</h2>
+            {% else %}
+            <h2>중앙동아리 연합회입니다.</h2>
+            {% endif %}
 
-                        <label for="password">비밀번호:</label>
-                        <input type="password" id="password" name="password" required />
-                        <button type="submit">로그인</button>
-                    </form>
-                </div>
-            </div>
         </main>
 
         <footer>
