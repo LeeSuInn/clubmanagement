@@ -20,7 +20,11 @@
             <div class="logo">로고</div>
             <nav>
                 <ul>
+                    {% if request.session.uid %}
+                    <li><a href="/your_view/">동아리통합시스템</a></li>
+                {% else %}
                     <li><a href="/index/">동아리통합시스템</a></li>
+                {% endif %}
                     <li><a href="/members/">부원관리</a></li>
                     <li><a href="/money/">회비관리</a></li>
                     <li><a href="/calendar/">일정관리</a></li>

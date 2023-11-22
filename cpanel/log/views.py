@@ -42,7 +42,7 @@ def postsign(request):
     session_id=user['idToken']
     uid = extract_uid_from_id_token(session_id)
     request.session['uid'] = str(uid)
-    return HttpResponseRedirect(reverse('index'))
+    return HttpResponseRedirect(reverse('your_view'))
 
 def logout(request):
     try:
