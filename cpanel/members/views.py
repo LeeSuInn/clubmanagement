@@ -1,9 +1,13 @@
-import logging
+import json
 from django.shortcuts import render
 import pyrebase
 from firebase_admin import firestore
 from django.http import JsonResponse
 from google.cloud import firestore
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+
+
 
 #firebase 프로젝트 정보
 config ={
@@ -55,3 +59,76 @@ def get_data(request):
         return JsonResponse({'status': 'success', 'data': data}, json_dumps_params={'ensure_ascii': False})
     else:
         return JsonResponse({'status': 'error', 'message': 'No documents found'})
+
+@require_POST
+def add_member(request):
+    user_uid = request.session.get('uid')
+    try:
+        # 클라이언트에서 전송한 데이터 가져오기
+        data = request.POST
+
+        # Firestore에 데이터 추가
+        members_ref = db.collection(str(user_uid)).document('동아리').collection('부원')
+
+        학번 = data.get('학번', '')
+        member_ref = members_ref.document(학번)
+        member_ref.set({ 
+            '학번': 학번,
+            '이름': data.get('이름', ''),
+            '전화번호': data.get('전화번호', ''),
+            '이메일': data.get('이메일', ''),
+            '직책': data.get('직책', ''),
+        })
+
+
+        return JsonResponse({'status': 'success', 'message': '부원을 성공적으로 추가하였습니다.'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
+
+@csrf_exempt
+@require_POST
+def delete_members(request):
+    try:
+        # 클라이언트에서 전송한 데이터 가져오기
+        data = json.loads(request.body.decode('utf-8'))
+        학번Array = data.get('학번Array', [])
+
+        # 현재 세션의 uid를 가져옴
+        user_uid = request.session.get('uid')
+        
+        # uid를 이용하여 해당 컬렉션을 가져옴
+        collection_ref = db.collection(str(user_uid)).document('동아리').collection('부원')
+
+        for 학번 in 학번Array:
+            # 문서 ID로 학번을 사용하여 해당 문서 삭제
+            doc_ref = collection_ref.document(학번)
+            doc_ref.delete()
+
+        return JsonResponse({'status': 'success', 'message': '선택한 부원들을 성공적으로 삭제하였습니다.'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
+
+def edit_member(request):
+    if request.method == 'POST':
+        try:
+            # 클라이언트로부터 받은 JSON 데이터를 파싱합니다.
+            data = json.loads(request.body.decode('utf-8'))
+
+            # 현재 세션의 uid를 가져옴
+            user_uid = request.session.get('uid')
+
+            # 학번을 기준으로 해당 멤버를 찾습니다.
+            member_ref = db.collection(user_uid).document('동아리').collection('부원').document(data['학번'])
+
+            # 수정된 데이터로 업데이트합니다.
+            member_ref.update({
+                '이름': data['이름'],
+                '전화번호': data['전화번호'],
+                '이메일': data['이메일'],
+                '직책': data['직책'],
+            })
+
+            return JsonResponse({'status': 'success', 'message': '멤버 정보가 성공적으로 수정되었습니다.'})
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})

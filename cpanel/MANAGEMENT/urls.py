@@ -36,5 +36,8 @@ urlpatterns = [
     path('calendar/', scheduleview.calendar, name="calendar"),
     path('logout/', logview.logout_view, name='logout'),
     path('get_data/', membersview.get_data, name='get_data'),
-    path('your_view/', views.your_view, name ="your_view")
+    path('your_view/', views.your_view, name ="your_view"),
+    path('add_member/', membersview.add_member, name='add_member'),
+    path('delete_members/', membersview.delete_members, name='delete_members'),
+    path('edit_member/', membersview.edit_member, name='edit_member'),
 ]

@@ -11,6 +11,46 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
     <style>
+
+        #addMemberForm {
+            max-width: 200px; /* 현재 크기의 절반으로 설정 */
+            margin: 0 auto;
+            padding: 10px;
+            background-color: #f4f4f4;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 레이블 스타일 */
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        /* 입력 필드 스타일 */
+        input {
+            width: 100%;
+            padding: 6px;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        /* 추가하기 버튼 스타일 */
+        input[type="submit"] {
+            background-color: #4caf50;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
         table {
             border-collapse: collapse;
             width: 100%;
@@ -25,12 +65,44 @@
         th {
             background-color: #f2f2f2;
         }
-        #editButton {
-            float: right;
-            margin-top: -50px;
-            margin-right: 20px; 
+
+        #button-container {
+            display: flex;
+            justify-content: flex-end; /* 버튼을 오른쪽으로 정렬합니다. */
+        }
+
+        #button-container button {
+            width: 80px; /* 버튼의 너비를 조정합니다. */
+            height: 30px; /* 버튼의 높이를 조정합니다. */
+        }
+
+        #addmemberButton,
+        #editmemberButton,
+        #deletememberButton {
+            height: 30px;
+            margin-top: -50px; /* 버튼의 위치를 상단으로 조절합니다. */
             cursor: pointer;
         }
+    
+        #addmemberButton {
+            float: right;
+            margin-right: 5px;
+        }
+    
+        #editmemberButton {
+            float: right;
+            margin-right: 5px; /* 수정 버튼과의 간격 조절 */
+        }
+
+        #deletememberButton {
+            float: right;
+            margin-right: 5px; /* 수정 버튼과의 간격 조절 */
+        }
+
+        th:first-child {
+            text-align: center; /* 선택 열의 첫 번째 자식(텍스트)을 가운데 정렬합니다. */
+        }
+    
 
     </style>
     <title>동아리통합시스템</title>
@@ -59,13 +131,20 @@
 
     <h2>부원 목록</h2>
 
-    <button id="editButton">수정하기</button>
+    <div id="button-container">
+        <button id="addmemberButton" onclick="toggleFormVisibility()">추가하기</button>
+        <button id="editmemberButton" onclick="toggleEditFormVisibility()">수정하기</button>
+        <button id="deletememberButton" onclick="deleteSelectedMembers()">선택 삭제</button>
+    </div>
+
+
         <tbody>
             <!-- 테이블의 내용이 동적으로 추가될 부분 -->
             {% if request.session.uid %}            
             <table id="data-table">
                 <thead>
                     <tr>
+                        <th>선택</th>
                         <th>학번</th>
                         <th>이름</th>
                         <th>전화번호</th>
@@ -78,53 +157,264 @@
                     <!-- 데이터가 여기에 동적으로 추가될 것입니다. -->
                 </tbody>
             </table>
+
+            <div id="addMemberForm" style="display: none;">
+                <h3>새로운 멤버 추가</h3>
+                <form id="memberForm">
+                    {% csrf_token %}
+                    <label for="학번">학번:</label>
+                    <input type="text" id="학번" name="학번" required>
+        
+                    <label for="이름">이름:</label>
+                    <input type="text" id="이름" name="이름" required>
+        
+                    <label for="전화번호">전화번호:</label>
+                    <input type="text" id="전화번호" name="전화번호" required>
+        
+                    <label for="이메일">이메일:</label>
+                    <input type="email" id="이메일" name="이메일" required>
+        
+                    <label for="직책">직책:</label>
+                    <input type="text" id="직책" name="직책" required>
+        
+                    <input type="button" value="추가하기" onclick="addMember()">
+                </form>
+            </div>    
+        
+            <div id="editMemberForm" style="display: none;">
+                <h3>멤버 수정</h3>
+                <form id="editMemberForm">
+                    {% csrf_token %}
+                    <label for="edit_학번">학번:</label>
+                    <input type="text" id="edit_학번" name="edit_학번" required disabled>
+            
+                    <label for="edit_이름">이름:</label>
+                    <input type="text" id="edit_이름" name="edit_이름" required>
+            
+                    <label for="edit_전화번호">전화번호:</label>
+                    <input type="text" id="edit_전화번호" name="edit_전화번호" required>
+            
+                    <label for="edit_이메일">이메일:</label>
+                    <input type="email" id="edit_이메일" name="edit_이메일" required>
+            
+                    <label for="edit_직책">직책:</label>
+                    <input type="text" id="edit_직책" name="edit_직책" required>
+            
+                    <input type="button" value="수정 완료" onclick="editMember()">
+                    <input type="button" value="취소" id="cancelEditButton">
+                </form>
+            </div>
+            
             
             <script>
-            function fetchData() {
-                fetch('/get_data/')  // Django 프로젝트에 맞게 URL 조정
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            displayData(data.data);
-                        } else {
-                            displayError(data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('데이터 가져오는 중 오류 발생:', error);
-                        displayError('데이터를 가져오는 중 오류가 발생했습니다.');
-                    });
-            }
-            
-            function displayData(data) {
-                var tbody = document.getElementById('data-body');
-            
-                // 표에 있는 기존 데이터를 지웁니다.
-                tbody.innerHTML = '';
-            
-                // 표에 각 부원의 정보를 새로운 행으로 추가합니다.
-                data.forEach(member => {
-                    var row = document.createElement('tr');
-                    row.innerHTML = `
+                function fetchData() {
+                    fetch('/get_data/')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                displayData(data.data);
+                            } else {
+                                displayError(data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('데이터 가져오는 중 오류 발생:', error);
+                            displayError('데이터를 가져오는 중 오류가 발생했습니다.');
+                        });
+                }
+                
+                function displayData(data) {
+                    var tbody = document.getElementById('data-body');
+                
+                    // 표에 있는 기존 데이터를 지웁니다.
+                    tbody.innerHTML = '';
+                
+                    // 표에 각 부원의 정보를 새로운 행으로 추가합니다.
+                    data.forEach(member => {
+                        var row = document.createElement('tr');
+                        row.innerHTML = `
+                        <td><input type="checkbox" class="select-checkbox"></td>
                         <td>${member.학번}</td>
                         <td>${member.이름}</td>
                         <td>${member.전화번호}</td>
                         <td>${member.이메일}</td>
                         <td>${member.직책}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            }
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+                                
+                // 페이지 로드 시 fetchData 함수 호출
+                document.addEventListener('DOMContentLoaded', fetchData);
+
+                function addMember() {
+                    var formData = new FormData(document.getElementById('memberForm'));
+        
+                    fetch('/add_member/', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            alert(data.message);
+                            
+                            //입력 폼에 있는 추가한 멤버의 데이터 초기화
+                            document.getElementById('학번').value = '';
+                            document.getElementById('이름').value = '';
+                            document.getElementById('전화번호').value = '';
+                            document.getElementById('이메일').value = '';
+                            document.getElementById('직책').value = '';
+
+                            toggleFormVisibility();
+                            
+                            // 페이지 새로고침하여 업데이트된 멤버 목록 표시
+                            fetchData();
+                            
+                        } else {
+                            alert('멤버 추가에 실패했습니다: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('멤버 추가 중 오류 발생:', error);
+                    });
+                }
+                
+                //추가할 멤버 데이터 입력 창 띄우기, 닫기
+                function toggleFormVisibility() {
+                    var form = document.getElementById('addMemberForm');
+                    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+                }
+
+                // 삭제 버튼을 눌렀을 때 선택한 데이터를 삭제하는 함수
+                function deleteSelectedMembers() {
+                    var selectedCheckboxes = document.querySelectorAll('.select-checkbox:checked');
+                    
+                    // 선택한 부원들의 학번을 배열에 저장
+                    var 학번Array = Array.from(selectedCheckboxes).map(checkbox => {
+                        var row = checkbox.closest('tr');
+                        return row.querySelector('td:nth-child(2)').textContent; // 학번이 들어있는 열
+                    });
+                    
+                    // 학번이 배열에 있다면 삭제 진행
+                    if (학번Array.length > 0) {
+                        // 서버에 삭제 요청 전송
+                        fetch('/delete_members/', {
+                            method: 'POST',
+                            body: JSON.stringify({ '학번Array': 학번Array }), // JSON 형식으로 변경
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                            },
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                alert(data.message);
+                                // 페이지 새로고침하여 업데이트된 멤버 목록 표시
+                                fetchData();
+                            } else {
+                                alert('멤버 삭제에 실패했습니다: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('멤버 삭제 중 오류 발생:', error);
+                        });
+                    } else {
+                        alert('선택된 학번이 없습니다.');
+                    }
+                }
+
+                function toggleEditFormVisibility() {
+                    var selectedRows = getSelectedRows();
+                    
+                    // 체크된 행이 하나일 경우에만 수정 폼 열기(하나씩 수정하기)
+                    if (selectedRows.length === 1) {
+                        editSelectedRow(selectedRows[0]);
+                    } else {
+                        // 체크된 행이 없거나 다수일 경우 경고 메시지 표시
+                        alert('수정할 항목을 하나만 선택하세요.');
+                    }
+                }
+                
+                // 수정 폼 열기
+                function editSelectedRow(row) {
+                    // 수정 폼에 선택된 행의 데이터 표시
+                    document.getElementById('edit_학번').value = row.cells[1].textContent;
+                    document.getElementById('edit_이름').value = row.cells[2].textContent;
+                    document.getElementById('edit_전화번호').value = row.cells[3].textContent;
+                    document.getElementById('edit_이메일').value = row.cells[4].textContent;
+                    document.getElementById('edit_직책').value = row.cells[5].textContent;
             
-            function displayError(message) {
-                // 필요하다면 오류 표시를 처리합니다.
-            }
+                    // 수정 폼을 보이게 설정
+                    var editForm = document.getElementById('editMemberForm');
+                    editForm.style.display = 'block';
+                }
+                // "취소" 버튼 클릭 시 수정 폼 닫기
+                document.getElementById('cancelEditButton').addEventListener('click', closeEditForm);
+                            
+                function editMember() {
+                    // 폼에서 수정된 멤버 데이터 가져오기
+                    var editedMemberData = {
+                        학번: document.getElementById('edit_학번').value,
+                        이름: document.getElementById('edit_이름').value,
+                        전화번호: document.getElementById('edit_전화번호').value,
+                        이메일: document.getElementById('edit_이메일').value,
+                        직책: document.getElementById('edit_직책').value,
+                    };
+                
+                    // 수정된 멤버 데이터를 서버로 전송하여 처리
+                    fetch('/edit_member/', {
+                        method: 'POST',
+                        body: JSON.stringify(editedMemberData),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            alert(data.message);
+        
+                            // 수정 폼 숨기기
+                            toggleEditFormVisibility();
+                            
+                            //수정 완료 후 수정 폼 닫기
+                            var editForm = document.getElementById('editMemberForm');
+                            editForm.style.display = 'none';
+        
+                            // 멤버 목록 새로고침
+                            fetchData();  // 수정 후에 데이터 다시 가져와서 화면 갱신
+                
+                        } else {
+                            alert('멤버 수정에 실패했습니다: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('멤버 수정 중 오류 발생:', error);
+                    });
+                }                        
             
-            // 페이지 로드 시 fetchData 함수 호출
-            document.addEventListener('DOMContentLoaded', fetchData);
+                // 선택된 행들을 배열로 반환하는 함수
+                function getSelectedRows() {
+                    var selectedRows = [];
+                    // 모든 체크박스 요소에 대해 반복
+                    var checkboxes = document.querySelectorAll('.select-checkbox');
+                    checkboxes.forEach(checkbox => {
+                        if (checkbox.checked) {
+                            // 체크된 행을 배열에 추가
+                            var row = checkbox.closest('tr');
+                            selectedRows.push(row);
+                        }
+                    });
+                    return selectedRows;
+                }    
             </script>
             {% endif %}
-
         </tbody>
     </table>
 </body>
