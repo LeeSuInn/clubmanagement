@@ -1,7 +1,6 @@
 import json
 from django.shortcuts import render
 import pyrebase
-from firebase_admin import firestore
 from django.http import JsonResponse
 from google.cloud import firestore
 from django.views.decorators.http import require_POST
@@ -69,6 +68,7 @@ def add_member(request):
 
         # Firestore에 데이터 추가
         members_ref = db.collection(str(user_uid)).document('동아리').collection('부원')
+        dues_ref = db.collection(str(user_uid)).document('동아리').collection('회비 관리')
 
         학번 = data.get('학번', '')
         member_ref = members_ref.document(학번)
@@ -78,6 +78,12 @@ def add_member(request):
             '전화번호': data.get('전화번호', ''),
             '이메일': data.get('이메일', ''),
             '직책': data.get('직책', ''),
+        })
+        due_ref = dues_ref.document(학번)
+        due_ref.set({
+            '이름': data.get('이름', ''),
+            '1학기': False,
+            '2학기': False  # 예시로 '1학기' 필드를 추가
         })
 
 
@@ -97,12 +103,16 @@ def delete_members(request):
         user_uid = request.session.get('uid')
         
         # uid를 이용하여 해당 컬렉션을 가져옴
-        collection_ref = db.collection(str(user_uid)).document('동아리').collection('부원')
+        member_collection_ref = db.collection(str(user_uid)).document('동아리').collection('부원')
+        pay_dues_collection_ref = db.collection(str(user_uid)).document('동아리').collection('회비 관리')
 
         for 학번 in 학번Array:
             # 문서 ID로 학번을 사용하여 해당 문서 삭제
-            doc_ref = collection_ref.document(학번)
-            doc_ref.delete()
+            member_doc_ref = member_collection_ref.document(학번)
+            member_doc_ref.delete()
+            
+            pay_dues_doc_ref = pay_dues_collection_ref.document(학번) 
+            pay_dues_doc_ref.delete()
 
         return JsonResponse({'status': 'success', 'message': '선택한 부원들을 성공적으로 삭제하였습니다.'})
     except Exception as e:

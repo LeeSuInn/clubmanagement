@@ -7,6 +7,39 @@
         <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
         <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js" integrity="sha256-alsi6DkexWIdeVDEct5s7cnqsWgOqsh2ihuIZbU6H3I=" crossorigin="anonymous"></script>
+        <style>
+            #money-link {
+                position: relative;
+            }
+        
+            #money-submenu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                background-color: #fff;
+                border: 1px solid #ccc;
+                padding: 8px;
+                width: 115px; /* 너비 축소 */
+            }
+                
+            #money-submenu li {
+                list-style: none; 
+                margin-bottom: 5px; /* 각 메뉴 간격 조정 */
+            }
+        
+            #money-submenu a {
+                text-decoration: none;
+                color: #333;
+                display: block;
+                padding: 3px; /* 내부 여백 축소 */
+                white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+            }
+        
+            #money-link:hover #money-submenu {
+                display: block;
+            }
+        </style>
 
         <title>동아리통합시스템</title>
     </head>
@@ -21,7 +54,13 @@
                     <li><a href="/index/">동아리통합시스템</a></li>
                 {% endif %}
                     <li><a href="/members/">부원관리</a></li>
-                    <li><a href="/money/">회비관리</a></li>
+                    <li id="money-link">
+                        <a href="/money/">회비관리</a>
+                        <ul class="submenu" id="money-submenu">
+                            <li><a href="/money/">회비 목록</a></li>
+                            <li><a href="/pay_dues_list/">회비 납부 내역</a></li>
+                        </ul>
+                    </li>
                     <li><a href="/calendar/">일정관리</a></li>
                 {% if request.session.uid %}
                     <li><a href="/logout/">로그아웃</a></li>
@@ -42,40 +81,5 @@
 
         <footer>
         </footer>
-        <script>
-            var modal = document.getElementById('myModal');
-            var loginBtn = document.getElementById('loginBtn');            
-            var closeBtn = document.getElementsByClassName('close')[0];
-            loginBtn.onclick = function () {
-                modal.style.display = 'block';
-            };
-
-            // 모달 닫기 버튼 클릭 시 모달 숨김
-            closeBtn.onclick = function () {
-                modal.style.display = 'none';
-            };
-
-            
-            window.onclick = function (event) {
-                if (event.target == modal) {
-                    modal.style.display = 'none';
-                }
-            };
-
-            //밑에서 id, password 확인 예정 
-            var loginForm = document.getElementById('loginForm');
-            loginForm.addEventListener('submit', function (event) {
-                event.preventDefault();
-                var username = document.getElementById('username').value;
-                var password = document.getElementById('password').value;
-                console.log('Username:', username, 'Password:', password);
-               
-                modal.style.display = 'none';  
-            });
-
-            <script src="{% static 'jquery-3.7.1.min.js' %}" integrity="sha256-..." crossorigin="anonymous"></script>
-            <script src="{% static 'fullcalendar@6.1.9/index.global.min.js' %}" integrity="sha256-..." crossorigin="anonymous"></script>
-
-        </script>
     </body>
 </html>

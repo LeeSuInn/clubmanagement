@@ -33,6 +33,37 @@
             cursor: pointer;
         }
 
+        #money-link {
+            position: relative;
+        }
+    
+        #money-submenu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 8px;
+            width: 115px; /* 너비 축소 */
+        }
+            
+        #money-submenu li {
+            list-style: none; 
+            margin-bottom: 5px; /* 각 메뉴 간격 조정 */
+        }
+    
+        #money-submenu a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+            padding: 3px; /* 내부 여백 축소 */
+            white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+        }
+    
+        #money-link:hover #money-submenu {
+            display: block;
+        }
     </style>
     <title>동아리통합시스템</title>
 </head>
@@ -47,7 +78,13 @@
                     <li><a href="/index/">동아리통합시스템</a></li>
                 {% endif %}
                     <li><a href="/members/">부원관리</a></li>
-                    <li><a href="/money/">회비관리</a></li>
+                    <li id="money-link">
+                        <a href="/money/">회비관리</a>
+                        <ul class="submenu" id="money-submenu">
+                            <li><a href="/money/">회비 목록</a></li>
+                            <li><a href="/pay_dues_list/">회비 납부 내역</a></li>
+                        </ul>
+                    </li>
                     <li><a href="/calendar/">일정관리</a></li>
                 {% if request.session.uid %}
                     <li><a href="/logout/">로그아웃</a></li>

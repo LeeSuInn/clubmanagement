@@ -29,8 +29,6 @@ urlpatterns = [
     path('signIn/', logview.signIn, name ='login'),
     path('index/', views.index, name ="index"),
     path('postsign/', logview.postsign, name ='postsign'),
-    path('create/', views.create, name="create"),
-    path('post_create/', views.post_create, name="post_create"),
     path('members/', membersview.members, name="members"),
     path('money/', moneyview.money, name="money"),
     path('calendar/', scheduleview.calendar, name="calendar"),
@@ -40,4 +38,5 @@ urlpatterns = [
     path('add_member/', membersview.add_member, name='add_member'),
     path('delete_members/', membersview.delete_members, name='delete_members'),
     path('edit_member/', membersview.edit_member, name='edit_member'),
+    path('pay_dues_list/', moneyview.pay_dues_list, name='pay_dues_list'),
 ]
