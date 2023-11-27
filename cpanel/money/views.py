@@ -1,6 +1,9 @@
+import json
+from django.http import JsonResponse
 from django.shortcuts import render
 import pyrebase
 from google.cloud import firestore
+from django.views.decorators.cache import cache_control
 
 
 #firebase 프로젝트 정보
@@ -54,7 +57,50 @@ def get_pay_dues__data(user_uid):
         payments.append({
             '학번': member_doc.id,
             '이름': member_data.get('이름', ''),
-            '1학기': bool(member_data.get('1학기', False)),
-            '2학기': bool(member_data.get('2학기', False)),
+            '1학기': member_data.get('1학기', None),
+            '2학기': member_data.get('2학기', None),
         })
     return payments
+
+def sanitize_document_id(document_id):
+    # 특수 문자 및 공백 제거
+    cleaned_id = ''.join(e for e in document_id if e.isalnum())
+    # 길이 제한
+    return cleaned_id[:150]
+
+
+def pay_dues_edit(request):
+    user_uid = request.session.get('uid', '')  # 세션에서 사용자 UID 가져오기
+    payments = get_pay_dues__data(user_uid)
+
+    if request.method == 'POST':
+        # POST 요청이면 수정된 데이터를 Firestore에 업데이트
+        json_data = json.loads(request.body.decode('utf-8'))
+        updated_data_list = json_data.get('updated_data', [])
+
+        for updated_data in updated_data_list:
+            # 각 행에서 1학기와 2학기 값을 가져옴
+            student_id = updated_data.get('학번')  # '학번'과 같은 키 사용
+            
+            if student_id is not None:
+                # 각 학생의 데이터 추출
+                value1 = updated_data.get('1학기')
+                value2 = updated_data.get('2학기')
+
+            # Firestore에 업데이트
+                firestore_document = db.collection(user_uid).document("동아리").collection("회비 관리").document(student_id)
+                try:
+                    firestore_document.update({
+                        '1학기': value1,
+                        '2학기': value2,
+                    })
+                    print("Firestore 업데이트 성공")
+                except Exception as e:
+                    print(f"Firestore 업데이트 실패: {e}")
+            else:
+                # student_id가 None인 경우에 대한 처리
+                print("학생 ID가 None입니다. 데이터를 처리하지 않습니다.")
+
+        return JsonResponse({'status': 'success'})
+
+    return render(request, 'pay_dues.html', {'payments': payments})

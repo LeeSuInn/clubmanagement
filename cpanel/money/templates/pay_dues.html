@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
         <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js" integrity="sha256-alsi6DkexWIdeVDEct5s7cnqsWgOqsh2ihuIZbU6H3I=" crossorigin="anonymous"></script>
+
         <style>
             table {
                 border-collapse: collapse;
@@ -22,13 +22,7 @@
             th {
                 background-color: #f2f2f2;
             }
-            #editButton {
-                float: right;
-                margin-top: -50px;
-                margin-right: 20px; 
-                cursor: pointer;
-            }
-    
+
             #money-link {
                 position: relative;
             }
@@ -60,7 +54,27 @@
             #money-link:hover #money-submenu {
                 display: block;
             }
-        </style>
+
+            #editButton {
+                float: right;
+                margin-top: -50px;
+                margin-right: 20px; 
+                cursor: pointer;
+            }
+    
+            .edit-mode {
+                background-color: #e6f7ff; /* 편집 모드 배경색 */
+            }
+        
+            .saveButton {
+                float: right;
+                margin-top: -50px;
+                margin-right: 20px; 
+                cursor: pointer;
+                display: none;
+                cursor: pointer;
+            }
+            </style>
 
         <title>동아리통합시스템</title>
     </head>
@@ -94,30 +108,121 @@
 
         <h2>회비 납부 내역</h2>
 
-        <button id="editButton">수정하기</button>
-
-        <table>
+        <button id="editButton" onclick="editButtonClick()">수정하기</button>
+        <button class="saveButton" style="display: none;" id="saveButton" onclick="saveButtonClick()">수정 완료</button>
+    
+        <table id="payment_management_Table">
             <thead>
                 <tr>
                     <th>학번</th>
                     <th>이름</th>
-                    <th>1학기</th>
-                    <th>2학기</th>
+                    <th>
+                        1학기
+                        <button class="sortButton" data-column="2" data-type="string">정렬</button>
+                    </th>
+                    <th>
+                        2학기
+                        <button class="sortButton" data-column="3" data-type="string">정렬</button>
+                    </th>
                 </tr>
             </thead>
             <tbody>
                 {% for payment in payments %}
-                    <tr>
-                        <td>{{ payment.학번 }}</td>
-                        <td>{{ payment.이름 }}</td>
-                        <td>{% if payment.1학기 %}O{% else %}X{% endif %}</td>
-                        <td>{% if payment.2학기 %}O{% else %}X{% endif %}</td>
-                    </tr>
+                <tr>
+                    <td>{{ payment.학번 }}</td>
+                    <td>{{ payment.이름 }}</td>
+                    <td class="editable">
+                        <span class="semester" id="semester-1-{{ forloop.counter }}">{{ payment.1학기|yesno:"O,X" }}</span>
+                        <select class="editable-options" id="semester-1-edit-{{ forloop.counter }}" data-counter="{{ forloop.counter }}" style="display: none;">
+                            <option value="true" {% if payment.1학기 %}selected{% endif %}>O</option>
+                            <option value="false" {% if not payment.1학기 %}selected{% endif %}>X</option>
+                        </select>
+                    </td>
+                    <td class="editable">
+                        <span class="semester" id="semester-2-{{ forloop.counter }}">{{ payment.2학기|yesno:"O,X" }}</span>
+                        <select class="editable-options" id="semester-2-edit-{{ forloop.counter }}" data-counter="{{ forloop.counter }}" style="display: none;">
+                            <option value="true" {% if payment.2학기 %}selected{% endif %}>O</option>
+                            <option value="false" {% if not payment.2학기 %}selected{% endif %}>X</option>
+                        </select>
+                    </td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
-    
-        <footer>
-        </footer>
+
+
+        <script>
+                //1, 2학기 납부내역 수정하기
+                function editButtonClick() {
+                    // 각 행의 셀을 수정 가능한 Select Box로 변경
+                    var rows = document.querySelectorAll('#payment_management_Table tbody tr');
+                    rows.forEach(function (row) {
+                        var cell3 = row.querySelector('td:nth-child(3)');
+                        var cell4 = row.querySelector('td:nth-child(4)');
+                        var value1 = cell3.textContent.trim() === 'O';
+                        var value2 = cell4.textContent.trim() === 'O';
+                        var select1 = '<select class="semester-select1"><option value="true" ' + (value1 ? 'selected' : '') + '>O</option><option value="false" ' + (!value1 ? 'selected' : '') + '>X</option></select>';
+                        var select2 = '<select class="semester-select2"><option value="true" ' + (value2 ? 'selected' : '') + '>O</option><option value="false" ' + (!value2 ? 'selected' : '') + '>X</option></select>';
+                        cell3.innerHTML = select1;
+                        cell4.innerHTML = select2;
+                    });
+        
+                    // 수정 버튼 숨기고 저장 버튼 표시
+                    document.getElementById('editButton').style.display = 'none';
+                    document.getElementById('saveButton').style.display = 'block';
+                }
+        
+                function saveButtonClick() {
+                    // 수정된 데이터 저장
+                    var updatedData = [];
+                    var rows = document.querySelectorAll('#payment_management_Table tbody tr');
+                    rows.forEach(function (row) {
+                        var studentNumber = row.querySelector('td:nth-child(1)').textContent;
+                        var select1 = row.querySelector('.semester-select1:nth-child(1)');
+                        var select2 = row.querySelector('.semester-select2:nth-child(1)'); //NULL
+                        
+                        var value1 = select1 ? select1.value === 'true' : false;
+                        var value2 = select2 ? select2.value === 'true' : false;
+
+                        updatedData.push({
+                            '학번': studentNumber,
+                            '1학기': value1,
+                            '2학기': value2
+                        });
+                        console.log(updatedData)
+                    });
+                
+                    fetch('/pay_dues_edit/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'  // Django에서 CSRF 보호를 위한 토큰
+                        },
+                        body: JSON.stringify({ 'updated_data': updatedData })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('서버 응답:', data);
+                        // 서버에서의 응답에 따른 추가 로직 수행 가능
+                    })
+                    .catch(error => {
+                        console.error('에러 발생:', error);
+                    });
+        
+                    // 원래 상태로 복구
+                    rows.forEach(function (row) {
+                        var cell3 = row.querySelector('td:nth-child(3)');
+                        var cell4 = row.querySelector('td:nth-child(4)');
+                        var value1 = cell3.querySelector('.semester-select1').value === 'true';
+                        var value2 = cell4.querySelector('.semester-select2').value === 'true';
+                        cell3.innerHTML = value1 ? 'O' : 'X';
+                        cell4.innerHTML = value2 ? 'O' : 'X';
+                    });
+
+                    // 수정 버튼 표시하고 저장 버튼 숨기기
+                    document.getElementById('editButton').style.display = 'block';
+                    document.getElementById('saveButton').style.display = 'none';
+                    }
+        </script>
     </body>
 </html>

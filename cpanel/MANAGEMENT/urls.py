@@ -39,4 +39,5 @@ urlpatterns = [
     path('delete_members/', membersview.delete_members, name='delete_members'),
     path('edit_member/', membersview.edit_member, name='edit_member'),
     path('pay_dues_list/', moneyview.pay_dues_list, name='pay_dues_list'),
+    path('pay_dues_edit/', moneyview.pay_dues_edit, name='pay_dues_edit'),
 ]

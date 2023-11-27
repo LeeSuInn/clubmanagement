@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 
+
 #firebase 프로젝트 정보
 config ={
     'apiKey': "AIzaSyCKBN_w-mQNi1B0EIvIwOghr7y5afSkIb4",
@@ -128,14 +129,18 @@ def edit_member(request):
             user_uid = request.session.get('uid')
 
             # 학번을 기준으로 해당 멤버를 찾습니다.
-            member_ref = db.collection(user_uid).document('동아리').collection('부원').document(data['학번'])
+            member_collection_ref = db.collection(user_uid).document('동아리').collection('부원').document(data['학번'])
+            pay_dues_collection_ref = db.collection(user_uid).document('동아리').collection('회비 관리').document(data['학번'])
 
             # 수정된 데이터로 업데이트합니다.
-            member_ref.update({
+            member_collection_ref.update({
                 '이름': data['이름'],
                 '전화번호': data['전화번호'],
                 '이메일': data['이메일'],
                 '직책': data['직책'],
+            })
+            pay_dues_collection_ref.update({
+                '이름': data['이름'],
             })
 
             return JsonResponse({'status': 'success', 'message': '멤버 정보가 성공적으로 수정되었습니다.'})
