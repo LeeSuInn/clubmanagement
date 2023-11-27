@@ -40,4 +40,5 @@ urlpatterns = [
     path('edit_member/', membersview.edit_member, name='edit_member'),
     path('pay_dues_list/', moneyview.pay_dues_list, name='pay_dues_list'),
     path('pay_dues_edit/', moneyview.pay_dues_edit, name='pay_dues_edit'),
+    path('get_pay_dues__data_json/', moneyview.get_pay_dues__data_json, name='get_pay_dues__data_json'),
 ]

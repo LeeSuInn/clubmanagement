@@ -126,32 +126,54 @@
                     </th>
                 </tr>
             </thead>
-            <tbody>
-                {% for payment in payments %}
-                <tr>
-                    <td>{{ payment.학번 }}</td>
-                    <td>{{ payment.이름 }}</td>
-                    <td class="editable">
-                        <span class="semester" id="semester-1-{{ forloop.counter }}">{{ payment.1학기|yesno:"O,X" }}</span>
-                        <select class="editable-options" id="semester-1-edit-{{ forloop.counter }}" data-counter="{{ forloop.counter }}" style="display: none;">
-                            <option value="true" {% if payment.1학기 %}selected{% endif %}>O</option>
-                            <option value="false" {% if not payment.1학기 %}selected{% endif %}>X</option>
-                        </select>
-                    </td>
-                    <td class="editable">
-                        <span class="semester" id="semester-2-{{ forloop.counter }}">{{ payment.2학기|yesno:"O,X" }}</span>
-                        <select class="editable-options" id="semester-2-edit-{{ forloop.counter }}" data-counter="{{ forloop.counter }}" style="display: none;">
-                            <option value="true" {% if payment.2학기 %}selected{% endif %}>O</option>
-                            <option value="false" {% if not payment.2학기 %}selected{% endif %}>X</option>
-                        </select>
-                    </td>
-                </tr>
-                {% endfor %}
+            <tbody  id="data-body">
             </tbody>
+
+
         </table>
 
 
         <script>
+            //데이터 받아오는 함수
+            function fetchData() {
+                fetch('/get_pay_dues__data_json/')  //json 방식으로 데이터 받아오기
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            displayData(data.data); //성공할 경우 데이터 출력
+                        } else {
+                        }
+                    })
+                    .catch(error => {
+                        console.error('데이터 가져오는 중 오류 발생:', error);
+                    });            
+            }
+            
+            //받아온 데이터 출력하는 함수
+            function displayData(data) {
+                var tbody = document.getElementById('data-body');
+            
+                // 표에 있는 기존 데이터를 지웁니다.
+                tbody.innerHTML = '';
+            
+                // 표에 각 부원의 정보를 새로운 행으로 추가합니다.
+                data.forEach(payment => {
+                    var row = document.createElement('tr');
+                    row.innerHTML = `
+                    <td>${payment.학번}</td>
+                    <td>${payment.이름}</td>
+                    <td>${payment.일학기}</td>
+                    <td>${payment.이학기}</td>
+                `;
+                    tbody.appendChild(row);
+                });
+            }
+            // 페이지 로드 시 fetchData 함수 호출
+            document.addEventListener('DOMContentLoaded', function () {
+                fetchData();
+            })
+                            
+
                 //1, 2학기 납부내역 수정하기
                 function editButtonClick() {
                     // 각 행의 셀을 수정 가능한 Select Box로 변경
@@ -167,7 +189,7 @@
                         cell4.innerHTML = select2;
                     });
         
-                    // 수정 버튼 숨기고 저장 버튼 표시
+                    // 수정 버튼 숨기고 수정 완료 버튼 표시
                     document.getElementById('editButton').style.display = 'none';
                     document.getElementById('saveButton').style.display = 'block';
                 }
@@ -177,21 +199,22 @@
                     var updatedData = [];
                     var rows = document.querySelectorAll('#payment_management_Table tbody tr');
                     rows.forEach(function (row) {
-                        var studentNumber = row.querySelector('td:nth-child(1)').textContent;
-                        var select1 = row.querySelector('.semester-select1:nth-child(1)');
-                        var select2 = row.querySelector('.semester-select2:nth-child(1)'); //NULL
+                        var studentNumber = row.querySelector('td:nth-child(1)').textContent;//학번 저장
+                        var select1 = row.querySelector('.semester-select1:nth-child(1)');//선택된 값 저장
+                        var select2 = row.querySelector('.semester-select2:nth-child(1)'); //선택된 값 저장
                         
-                        var value1 = select1 ? select1.value === 'true' : false;
-                        var value2 = select2 ? select2.value === 'true' : false;
-
+                        var value1 = select1 ? select1.value === 'true' : false;//true면 true
+                        var value2 = select2 ? select2.value === 'true' : false;//false면 false
+                        
+                        //firestore에 전송
                         updatedData.push({
                             '학번': studentNumber,
                             '1학기': value1,
                             '2학기': value2
                         });
-                        console.log(updatedData)
                     });
-                
+                    
+                    //목록 수정한 거 적용
                     fetch('/pay_dues_edit/', {
                         method: 'POST',
                         headers: {
@@ -211,11 +234,11 @@
         
                     // 원래 상태로 복구
                     rows.forEach(function (row) {
-                        var cell3 = row.querySelector('td:nth-child(3)');
+                        var cell3 = row.querySelector('td:nth-child(3)');//갖고 있는 값 가져오기
                         var cell4 = row.querySelector('td:nth-child(4)');
-                        var value1 = cell3.querySelector('.semester-select1').value === 'true';
+                        var value1 = cell3.querySelector('.semester-select1').value === 'true';//O이면 true, X면 false
                         var value2 = cell4.querySelector('.semester-select2').value === 'true';
-                        cell3.innerHTML = value1 ? 'O' : 'X';
+                        cell3.innerHTML = value1 ? 'O' : 'X'; //true면 'O' 띄우기, false면 'X' 띄우기
                         cell4.innerHTML = value2 ? 'O' : 'X';
                     });
 

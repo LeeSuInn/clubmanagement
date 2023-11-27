@@ -26,7 +26,7 @@ authe = firebase.auth()
 database = firebase.database()
 db = firestore.Client()
 
-#사이트 띄우기
+#회비 내역 사이트
 def money(request):
     if 'uid' not in request.session:
         message = "login please." #틀린 정보일 때 경고 메세지
@@ -34,16 +34,13 @@ def money(request):
 
     return render(request, "money.html")
 
-#사이트 띄우기
+#회비 납부 목록 사이트
 def pay_dues_list(request):
     if 'uid' not in request.session:
         message = "login please." #틀린 정보일 때 경고 메세지
         return render(request, "signIn.html", {"messg":message})
 
-    user_uid = request.session.get('uid', '')  # 세션에서 사용자 UID 가져오기
-    payments = get_pay_dues__data(user_uid)
-
-    return render(request, 'pay_dues.html', {'payments': payments})
+    return render(request, "pay_dues.html")
 
 #firestore에서 데이터 가져오기
 def get_pay_dues__data(user_uid):
@@ -62,13 +59,21 @@ def get_pay_dues__data(user_uid):
         })
     return payments
 
-def sanitize_document_id(document_id):
-    # 특수 문자 및 공백 제거
-    cleaned_id = ''.join(e for e in document_id if e.isalnum())
-    # 길이 제한
-    return cleaned_id[:150]
+#firestore에서 데이터 가져와서 json 파일로 반환
+def get_pay_dues__data_json(request):
+    user_uid = request.session.get('uid')
+    doc_ref = db.collection(user_uid).document('동아리').collection('회비 관리')
+    docs = doc_ref.stream()
 
+    if docs:
+        # Firestore 문서 데이터를 JSON 형식으로 변환하여 응답
+        data = [{'학번': doc.id, '일학기': 'O' if doc.to_dict().get('1학기', False) else 'X', '이학기': 'O' if doc.to_dict().get('2학기', False) else 'X', **doc.to_dict()} for doc in docs]
+        print(data)
+        return JsonResponse({'status': 'success', 'data': data}, json_dumps_params={'ensure_ascii': False})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'No documents found'})
 
+#데이터 수정 후 firestore에 저장
 def pay_dues_edit(request):
     user_uid = request.session.get('uid', '')  # 세션에서 사용자 UID 가져오기
     payments = get_pay_dues__data(user_uid)
