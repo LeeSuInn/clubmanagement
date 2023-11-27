@@ -118,11 +118,11 @@
                     <th>이름</th>
                     <th>
                         1학기
-                        <button class="sortButton" data-column="2" data-type="string">정렬</button>
+                        <button class="sortButton" data-column="2" data-type="string" data-order="asc">▲</button>
                     </th>
                     <th>
                         2학기
-                        <button class="sortButton" data-column="3" data-type="string">정렬</button>
+                        <button class="sortButton" data-column="3" data-type="string" data-order="asc">▼</button>
                     </th>
                 </tr>
             </thead>
@@ -246,6 +246,48 @@
                     document.getElementById('editButton').style.display = 'block';
                     document.getElementById('saveButton').style.display = 'none';
                     }
+
+                // 정렬 상태를 나타내는 변수 추가
+                var sortAscending = true;
+
+                // 정렬 버튼 누를 시
+                $('.sortButton').on('click', function () {
+                    var column = $(this).data('column'); // 정렬할 열
+                    var type = $(this).data('type'); // 데이터 유형
+                    var order = $(this).data('order'); // 정렬 순서
+
+
+                    // 정렬 순서 업데이트
+                    sortAscending = order === 'asc' ? true : false;
+
+                    // 정렬 순서 업데이트
+                    $(this).data('order', sortAscending ? 'desc' : 'asc');
+                    
+                    sortTable(column, type, sortAscending);
+
+                    // 버튼 텍스트 업데이트
+                    var buttonText = sortAscending ? '▲' : '▼';
+                    $(this).text(column === 2 ? buttonText : buttonText);
+                });
+
+                // 테이블 정렬 함수
+                function sortTable(column, type, ascending) {
+                    var tbody = $('#payment_management_Table tbody');
+                    var rows = tbody.find('tr').toArray();
+
+                    rows.sort(function (a, b) {
+                        var aValue = $(a).find('td:eq(' + column + ')').text().trim();
+                        var bValue = $(b).find('td:eq(' + column + ')').text().trim();
+
+                        if (type === 'string') {
+                            return ascending ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+                        } else {
+                            return ascending ? aValue - bValue : bValue - aValue;
+                        }
+                    });
+
+                    tbody.empty().append(rows);
+                }
         </script>
     </body>
 </html>
