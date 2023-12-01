@@ -21,6 +21,7 @@ from log import views as logview
 from members import views   as membersview
 from money import views as moneyview
 from schedule import views as scheduleview
+from money import cash
 
 
 urlpatterns = [
@@ -41,4 +42,8 @@ urlpatterns = [
     path('pay_dues_list/', moneyview.pay_dues_list, name='pay_dues_list'),
     path('pay_dues_edit/', moneyview.pay_dues_edit, name='pay_dues_edit'),
     path('get_pay_dues__data_json/', moneyview.get_pay_dues__data_json, name='get_pay_dues__data_json'),
+    path('financial_list/', cash.financial_list, name='financial_list'),
+    path('cash_page/', cash.cash_page, name='cash_page'),
+    path('add_money/', cash.add_money, name='add_money'),
+    path('edit_money/', cash.edit_money, name='edit_money'),
 ]

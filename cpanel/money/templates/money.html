@@ -64,6 +64,42 @@
         #money-link:hover #money-submenu {
             display: block;
         }
+
+        .center-column {
+            text-align: center;
+        }
+
+        #button-container {
+            display: flex;
+            justify-content: flex-end; /* 버튼을 오른쪽으로 정렬  */
+        }
+
+        #button-container button {
+            width: 80px; /* 버튼의 너비를 조정 */
+            height: 30px; /* 버튼의 높이를 조정 */
+        }
+
+        #addmoneyButton {
+            float: right;
+            margin-right: 5px;/* 추가 버튼과의 간격 조절 */
+        }
+
+        #editmoneyButton {
+            float: right;
+            margin-right: 5px; /* 수정 버튼과의 간격 조절 */
+        }
+
+        #addmoneyButton,
+        #editmoneyButton {
+            height: 30px;
+            margin-top: -50px; /* 버튼의 위치를 상단으로 조절 */
+            cursor: pointer;
+        }
+
+        th:first-child {
+            text-align: center; /* 선택 텍스트 가운데 정렬합니다. */
+        }
+
     </style>
     <title>동아리통합시스템</title>
 </head>
@@ -79,9 +115,9 @@
                 {% endif %}
                     <li><a href="/members/">부원관리</a></li>
                     <li id="money-link">
-                        <a href="/money/">회비관리</a>
+                        <a href="/cash_page/">회비관리</a>
                         <ul class="submenu" id="money-submenu">
-                            <li><a href="/money/">회비 내역</a></li>
+                            <li><a href="/cash_page/">회비 내역</a></li>
                             <li><a href="/pay_dues_list/">회비 납부 목록</a></li>
                         </ul>
                     </li>
@@ -96,50 +132,295 @@
     </header>
     <h2>회비 목록</h2>
 
-    <button id="editButton">수정하기</button>
+    <div id="button-container">
+        <button id="addmoneyButton" onclick="toggleFormVisibility()">추가하기</button>
+        <button id="editmoneyButton" onclick="toggleEditFormVisibility()">수정하기</button>
+    </div>
 
     <table id="moneyTable">
         <thead>
             <tr>
+                <th>선택</th>
                 <th>입/출금</th>
                 <th>날짜</th>
                 <th>사유</th>
-                <th>잔액(잔액도 수정해주세요)</th>
+                <th>금액</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="dataBody">
             <!-- 테이블의 내용이 동적으로 추가될 부분 -->
         </tbody>
     </table>
 
-    <script>
-        
-        var data = [
-            { deposit_withdrawal: '+30000', date: '6월 3일', reason: '주웠음', balance: '70000'},
-            { deposit_withdrawal: '-20000', date: '4월 5일', reason: '잃어버렸음', balance: '40000'},
-        ];
-
-        // 테이블에 데이터 동적으로 추가
-        var tableBody = document.querySelector('#moneyTable tbody');
-
-        data.forEach(function (member) {
-            var row = tableBody.insertRow();
-            var cell1 = row.insertCell(0);
-            var cell2 = row.insertCell(1);
-            var cell3 = row.insertCell(2);
-            var cell4 = row.insertCell(3);
+    <div id="addmoneyForm" style="display: none;">
+        <h3>회비 추가</h3>
+        <form id="moneyForm">
+            {% csrf_token %}
+            <label for="입/출금">입/출금:</label>
+            <input type="text" id="입/출금" name="입/출금" required>
             
+            <label for="날짜">날짜:</label>
+            <input type="text" id="날짜" name="날짜" required>
+            
+            <label for="사유">사유:</label>
+            <input type="text" id="사유" name="사유" required>
+            
+            <label for="금액">금액:</label>
+            <input type="number" id="금액" name="금액" required>
 
-            cell1.textContent = member.deposit_withdrawal;
-            cell2.textContent = member.date;
-            cell3.textContent = member.reason;
-            cell4.textContent = member.balance;
+            <input type="button" value="추가하기" onclick="addmoney()">
+        </form>
+    </div>    
 
-            var editButton = document.createElement('button');
-            editButton.textContent = '수정하기';
-            editButton.className = 'edit-button';
+    <div id="editmoneyForm" style="display: none;">
+        <h3>회비 내역 수정</h3>
+        <form id="editmoneyForm">
+            {% csrf_token %}
+            <label for="edit_입/출금">입/출금:</label>
+            <input type="text" id="edit_입/출금" name="edit_입/출금" required>
+    
+            <label for="edit_날짜">날짜:</label>
+            <input type="text" id="edit_날짜" name="edit_날짜" required>
+    
+            <label for="edit_사유">사유:</label>
+            <input type="text" id="edit_사유" name="edit_사유" required>
+    
+            <label for="edit_금액">금액:</label>
+            <input type="number" id="edit_금액" name="edit_금액" required>
+        
+            <input type="button" value="수정 완료" onclick="editmoney()">
+            <input type="button" value="취소" id="cancelEditButton">
+        </form>
+    </div>
 
-        });
+
+    <script>
+        function fetchData() {
+            fetch('/financial_list/')  // Update the URL accordingly
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        displayData(data.data);
+                    }
+                })   
+            }
+            
+        function displayData(data) {
+            var tbody = document.getElementById('dataBody');
+            var lastBalance = null;
+
+            // 표에 있는 기존 데이터를 지웁니다.
+            tbody.innerHTML = '';
+
+            data['회비 내역'].forEach(financial => {
+                // 입/출금과 잔액을 숫자로 변환
+                var transactionAmount = parseFloat(financial['금액']);
+
+                var row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="select-checkbox">
+                    </td>
+                    <td>${financial['입/출금']}</td>
+                    <td>${financial['날짜']}</td>
+                    <td>${financial['사유']}</td>
+                    <td>${transactionAmount}</td>
+                `;
+                tbody.appendChild(row);
+
+                // 현재 행의 잔액 정보를 기록
+                lastBalance = parseFloat(data['잔액']);
+            });
+
+            //일단 주석처리(팀원한테 물어보고 결정)
+            {% comment %} // 모든 행을 추가한 이후에 잔액 열을 첫 번째 행으로 추가하고 중앙 정렬 
+            if (lastBalance !== null) {
+                var firstRow = document.createElement('tr');
+                var balanceCell = document.createElement('td');
+                balanceCell.colSpan = 4; // 잔액 열이 4개의 열을 합침
+                balanceCell.className = 'center-column';
+                balanceCell.textContent = `회비 잔액: ${lastBalance}`;
+                firstRow.appendChild(balanceCell);
+                tbody.insertBefore(firstRow, tbody.firstChild);
+            }
+            {% endcomment %}
+
+            // 모든 행을 추가한 이후에 한 번만 잔액 열을 추가하고 중앙 정렬
+            if (lastBalance !== null) {
+                var balanceRow = document.createElement('tr');
+                var balanceCell = document.createElement('td');
+                balanceCell.colSpan = 5; // 잔액 열이 4개의 열을 합침
+                balanceCell.className = 'center-column';
+                balanceCell.textContent = `회비 잔액: ${lastBalance}`;
+                balanceRow.appendChild(balanceCell);
+                tbody.appendChild(balanceRow);
+            }
+        }
+                                                                    
+            // 페이지 로드 시 fetchData 함수 호출
+            document.addEventListener('DOMContentLoaded', fetchData);
+
+        function addmoney() {
+            var formData = new FormData(document.getElementById('moneyForm'));
+            
+            fetch('/add_money/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(data.message);
+                    
+                    // 성공한 경우 추가적인 작업 수행(파일 제대로 보내고 있는지 확인)
+                    document.getElementById('입/출금').value = '';
+                    document.getElementById('날짜').value = '';
+                    document.getElementById('사유').value = '';
+                    document.getElementById('금액').value = '';
+
+                    toggleFormVisibility();
+
+                    // 페이지 새로고침하여 업데이트된 멤버 목록 표시
+                    fetchData();
+    
+                } else {
+                    alert('회비 추가에 실패했습니다: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('멤버 추가 중 오류 발생:', error);
+            });
+        }
+
+        function toggleFormVisibility() {
+            var form = document.getElementById('addmoneyForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function getSelectedRows() {
+            var selectedRows = [];
+            // 모든 체크박스 요소에 대해 반복
+            var checkboxes = document.querySelectorAll('.select-checkbox');
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    // 체크된 행을 배열에 추가
+                    var row = checkbox.closest('tr');
+                    selectedRows.push(row);
+                }
+            });
+            return selectedRows;
+        }
+
+        function toggleEditFormVisibility() {
+            var selectedRows = getSelectedRows();
+    
+            // 체크된 행이 하나일 경우에만 수정 폼 열기(하나씩 수정하기)
+            if (selectedRows.length === 1) {
+                editSelectedRow(selectedRows[0]);
+            } else {
+                // 체크된 행이 없거나 다수일 경우 경고 메시지 표시
+                alert('수정할 항목을 하나만 선택하세요.');
+            }
+        }
+    
+        // 수정 폼 열기
+        function editSelectedRow(row) {
+            // 수정 폼에 선택된 행의 데이터 표시
+            document.getElementById('edit_입/출금').value = row.cells[1].textContent;
+            document.getElementById('edit_날짜').value = row.cells[2].textContent;
+            document.getElementById('edit_사유').value = row.cells[3].textContent;
+            document.getElementById('edit_금액').value = row.cells[4].textContent;
+    
+            // 수정 폼을 보이게 설정
+            var editForm = document.getElementById('editmoneyForm');
+            editForm.style.display = 'block';
+        }
+        // "취소" 버튼 클릭 시 수정 폼 닫기
+        document.getElementById('cancelEditButton').addEventListener('click', closeEditForm);
+                    
+        function editmoney() {
+            // 폼에서 수정된 회비 내역 데이터 가져오기
+            var editedmoneyData = {
+                입출금: document.getElementById('edit_입/출금').value,
+                날짜: document.getElementById('edit_날짜').value,
+                사유: document.getElementById('edit_사유').value,
+                금액: document.getElementById('edit_금액').value,
+                // 선택된 행의 데이터 가져오기
+                selectedRowData: getSelectedRowData(),
+
+            };
+            console.log(editedmoneyData)
+        
+            // 수정된 멤버 데이터를 서버로 전송하여 처리
+            fetch('/edit_money/', {
+                method: 'POST',
+                body: JSON.stringify(editedmoneyData),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(data.message);
+                    clearEditForm();
+                    console.log(data)
+
+                    // 수정 폼 숨기기
+                    toggleEditFormVisibility();
+                    
+                    var editForm = document.getElementById('editmoneyForm');
+                    editForm.style.display = 'none';
+
+                    // 멤버 목록 새로고침
+                    fetchData();  // 수정 후에 데이터 다시 가져와서 화면 갱신
+        
+                } else {
+                    alert('멤버 수정에 실패했습니다: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('멤버 수정 중 오류 발생:', error);
+            });
+        }
+        
+        //취소하기 버튼 눌었을 때 창 닫기
+        function closeEditForm() {
+            var editForm = document.getElementById('editmoneyForm');
+            editForm.style.display = 'none';
+        }
+
+        // 선택된 행의 데이터를 가져오는 함수
+        function getSelectedRowData() {
+            var selectedRows = getSelectedRows();
+
+            if (selectedRows.length === 1) {
+                // 선택된 행이 하나인 경우 해당 행의 데이터 반환
+                var selectedRow = selectedRows[0];
+                return {
+                    입출금: selectedRow.cells[1].textContent,
+                    날짜: selectedRow.cells[2].textContent,
+                    사유: selectedRow.cells[3].textContent,
+                    금액: selectedRow.cells[4].textContent,
+                };
+            }
+
+            // 선택된 행이 없거나 다수인 경우 빈 객체 반환 또는 에러 처리
+            return {};
+        }
+
+        // 수정 폼을 닫고 입력된 값을 초기화하는 함수
+        function clearEditForm() {
+            document.getElementById('edit_입/출금').value = '';
+            document.getElementById('edit_날짜').value = '';
+            document.getElementById('edit_사유').value = '';
+            document.getElementById('edit_금액').value = '';
+        }
+
     </script>
 </body>
 </html>

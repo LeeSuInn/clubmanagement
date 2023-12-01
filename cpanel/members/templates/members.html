@@ -148,9 +148,9 @@
                 {% endif %}
                     <li><a href="/members/">부원관리</a></li>
                     <li id="money-link">
-                        <a href="/money/">회비관리</a>
+                        <a href="/cash_page/">회비관리</a>
                         <ul class="submenu" id="money-submenu">
-                            <li><a href="/money/">회비 내역</a></li>
+                            <li><a href="/cash_page/">회비 내역</a></li>
                             <li><a href="/pay_dues_list/">회비 납부 목록</a></li>
                         </ul>
                     </li>
@@ -194,7 +194,7 @@
             </table>
 
             <div id="addMemberForm" style="display: none;">
-                <h3>새로운 멤버 추가</h3>
+                <h3>새로운 부원 추가</h3>
                 <form id="memberForm">
                     {% csrf_token %}
                     <label for="학번">학번:</label>
@@ -467,9 +467,6 @@
                 moneyLink.addEventListener('mouseout', function() {
                     moneySubmenu.style.display = 'none';
                 });
-    
-    
-                    
             </script>
             {% endif %}
 

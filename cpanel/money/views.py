@@ -3,7 +3,6 @@ from django.http import JsonResponse
 from django.shortcuts import render
 import pyrebase
 from google.cloud import firestore
-from django.views.decorators.cache import cache_control
 
 
 #firebase 프로젝트 정보
