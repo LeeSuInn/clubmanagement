@@ -67,7 +67,6 @@ def get_pay_dues__data_json(request):
     if docs:
         # Firestore 문서 데이터를 JSON 형식으로 변환하여 응답
         data = [{'학번': doc.id, '일학기': 'O' if doc.to_dict().get('1학기', False) else 'X', '이학기': 'O' if doc.to_dict().get('2학기', False) else 'X', **doc.to_dict()} for doc in docs]
-        print(data)
         return JsonResponse({'status': 'success', 'data': data}, json_dumps_params={'ensure_ascii': False})
     else:
         return JsonResponse({'status': 'error', 'message': 'No documents found'})

@@ -112,6 +112,7 @@ def delete_members(request):
             member_doc_ref = member_collection_ref.document(학번)
             member_doc_ref.delete()
             
+            #회비 납부 관리페이지에서도 삭제
             pay_dues_doc_ref = pay_dues_collection_ref.document(학번) 
             pay_dues_doc_ref.delete()
 

@@ -46,4 +46,5 @@ urlpatterns = [
     path('cash_page/', cash.cash_page, name='cash_page'),
     path('add_money/', cash.add_money, name='add_money'),
     path('edit_money/', cash.edit_money, name='edit_money'),
+    path('delete_selected_rows/', cash.delete_selected_rows, name='delete_selected_rows'),
 ]

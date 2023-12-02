@@ -1,8 +1,8 @@
 import json
 from django.http import JsonResponse
 from django.shortcuts import render
-from firebase_admin import credentials
 import pyrebase
+from django.views.decorators.csrf import csrf_exempt
 from google.cloud import firestore
 
 
@@ -152,3 +152,56 @@ def edit_money(request):
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)})
         
+@csrf_exempt
+def delete_selected_rows(request):
+    user_uid = request.session.get('uid', '')  # 세션에서 사용자 UID 가져오기
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+            selected_data = data.get('selectedData', [])
+
+            doc_ref = db.collection(user_uid).document('동아리').collection('회비 내역')
+            documents = doc_ref.get()
+            del_doc = None
+
+            dues_ref = db.collection(user_uid).document('동아리')
+            dues_snapshot = dues_ref.get()
+            dues = int(dues_snapshot.to_dict().get('잔액'))
+
+
+            for row_data in selected_data:    
+                # Firestore에서 해당 데이터 삭제
+                # 'your_field'은 실제 사용하는 Firestore 필드명으로 변경
+                for doc in documents:
+                    docs = doc.to_dict()
+                    in_out_data = docs.get("입/출금")
+                    date_data = docs.get("날짜")
+                    reason_data = docs.get("사유")
+                    cash_data = int(docs.get("금액"))                
+
+                    if (
+                        row_data['입출금'] == in_out_data and 
+                        row_data['날짜'] == date_data and 
+                        row_data['사유'] == reason_data and 
+                        int(row_data['금액']) == cash_data
+                        ):
+                        del_doc = doc
+                        break
+
+                if del_doc is not None:
+                    del_doc_ref = doc_ref.document(del_doc.id)
+                    del_doc_ref.delete()
+
+                    if row_data['입출금'] == "입금":
+                        dues = dues - int(row_data['금액'])
+                    else:
+                        dues = dues + int(row_data['금액'])
+                dues_ref.update({'잔액': dues})
+
+                
+
+        # 삭제 작업이 성공했다면
+            return JsonResponse({'status': 'success', 'message': '선택한 회비 내역을 성공적으로 삭제하였습니다.'})
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
