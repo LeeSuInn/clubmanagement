@@ -53,12 +53,20 @@
             #money-link:hover #money-submenu {
                 display: block;
             }
+            
+            .logo img {
+                max-width: 80%;
+                height: auto;
+            }
+
             </style>
 
     </head>
     <body>
         <header>
-            <div class="logo">로고</div>
+            <div class="logo">
+                <img src="{% static 'jpeg/logo2.jpeg' %}" alt="로고">
+            </div>
             <nav>
                 <ul>
                 {% if request.session.uid %}
@@ -114,8 +122,15 @@
                             backgroundColor: '#5bc0de',
                             borderColor: '#46b8da'
                         }
-                    ]
+                    ],        
+                    events: '/get_calendar_events/',  // Django 뷰에서 일정 데이터를 동적으로 받아오는 URL
+                    eventTextColor: 'white',  // 이벤트 텍스트 색상 설정
+                    dayRender: function (info) {
+                        // 각 날짜에 날짜 텍스트를 삽입
+                        info.el.innerHTML = '<div class="date-number">' + info.dayNumberText + '</div>';
+                    }
                 });
+    
                 calendar.render();
             };
 

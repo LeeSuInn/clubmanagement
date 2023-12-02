@@ -168,14 +168,19 @@
         #cancelEditButton:hover {
             background-color: #bbb;
         }
-    
-
+        
+        .logo img {
+            max-width: 80%;
+            height: auto;
+        }
     </style>
     <title>동아리통합시스템</title>
 </head>
 <body>
     <header>
-        <div class="logo">로고</div>
+        <div class="logo">
+            <img src="{% static 'jpeg/logo2.jpeg' %}" alt="로고">
+        </div>
         <nav>
             <ul>
                 {% if request.session.uid %}

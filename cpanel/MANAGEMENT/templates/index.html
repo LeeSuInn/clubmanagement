@@ -46,14 +46,21 @@
             #money-link:hover #money-submenu {
                 display: block;
             }
+
+            .logo img {
+                max-width: 80%;
+                height: auto;
+            }
             </style>
 
         <title>동아리통합시스템</title>
     </head>
     <body>
         <header>
-            <div class="logo">로고</div>
-            <nav>
+            <div class="logo">
+                <img src="{% static 'jpeg/logo2.jpeg' %}" alt="로고">
+            </div>
+                        <nav>
                 <ul>
                 {% if request.session.uid %}
                     <li><a href="/your_view/">동아리통합시스템</a></li>
