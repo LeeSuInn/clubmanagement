@@ -11,45 +11,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
         <style>
-            #addMemberForm {
-                max-width: 200px;
-                margin: 0 auto;
-                padding: 10px;
-                background-color: #f4f4f4;
-                border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            }
-
-            /* 레이블 스타일 */
-            label {
-                display: block;
-                margin-bottom: 8px;
-            }
-
-            /* 입력 필드 스타일 */
-            input {
-                width: 100%;
-                padding: 6px;
-                margin-bottom: 12px;
-                box-sizing: border-box;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-            }
-
-            /* 추가하기 버튼 스타일 */
-            input[type="submit"] {
-                background-color: #4caf50;
-                color: white;
-                padding: 8px 12px;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-            }
-
-            input[type="submit"]:hover {
-                background-color: #45a049;
-            }
-
             table {
                 border-collapse: collapse;
                 width: 100%;
@@ -105,7 +66,7 @@
             #money-link {
                 position: relative;
             }
-
+            
             #money-submenu {
                 display: none;
                 position: absolute;
@@ -113,26 +74,89 @@
                 left: 0;
                 background-color: #fff;
                 border: 1px solid #ccc;
-                padding: 8px;
-                width: 115px; /* 너비 축소 */
+                padding: 6px; /* Reduced padding for a more compact look */
+                width: 150px; /* Adjusted width for better readability */
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                border-radius: 8px;
             }
-                
+            
             #money-submenu li {
-                list-style: none; 
-                margin-bottom: 5px; /* 각 메뉴 간격 조정 */
+                list-style: none;
+                margin-bottom: 4px; /* Reduced margin for tighter spacing */
             }
-
+            
             #money-submenu a {
                 text-decoration: none;
                 color: #333;
                 display: block;
-                padding: 3px; /* 내부 여백 축소 */
-                white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+                padding: 6px; /* Reduced padding for a more compact look */
+                transition: background-color 0.3s ease;
+            
+                &:hover {
+                    background-color: #f2f2f2;
+                    border-radius: 4px;
+                }
             }
-
+            
             #money-link:hover #money-submenu {
                 display: block;
             }
+    
+            /* 추가하기와 수정하기 폼 공통 스타일 */
+            #addMemberForm,
+            #editMemberForm {
+                max-width: 300px;
+                margin: 20px auto;
+                padding: 15px;
+                background-color: #f4f4f4;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+        
+            /* 추가하기와 수정하기 폼 내 레이블 스타일 */
+            #addMemberForm label,
+            #editMemberForm label {
+                display: block;
+                margin-bottom: 8px;
+            }
+        
+            /* 추가하기와 수정하기 폼 내 입력 필드 스타일 */
+            #addMemberForm input,
+            #editMemberForm input {
+                width: 100%;
+                padding: 8px;
+                margin-bottom: 12px;
+                box-sizing: border-box;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+        
+            /* 추가하기와 수정하기 버튼 스타일 */
+            #addMemberForm input[type="button"],
+            #editMemberForm input[type="button"] {
+                background-color: #4caf50;
+                color: white;
+                padding: 8px 12px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+        
+            #addMemberForm input[type="button"]:hover,
+            #editMemberForm input[type="button"]:hover {
+                background-color: #45a049;
+            }
+        
+            /* 수정하기 취소 버튼 스타일 */
+            #cancelEditButton {
+                background-color: #ccc;
+                color: #333;
+            }
+        
+            #cancelEditButton:hover {
+                background-color: #bbb;
+            }
+    
         </style>
         <title>동아리통합시스템</title>
     </head>

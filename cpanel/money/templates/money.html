@@ -36,7 +36,7 @@
         #money-link {
             position: relative;
         }
-    
+        
         #money-submenu {
             display: none;
             position: absolute;
@@ -44,27 +44,34 @@
             left: 0;
             background-color: #fff;
             border: 1px solid #ccc;
-            padding: 8px;
-            width: 115px; /* 너비 축소 */
+            padding: 6px; /* Reduced padding for a more compact look */
+            width: 150px; /* Adjusted width for better readability */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
         }
-            
+        
         #money-submenu li {
-            list-style: none; 
-            margin-bottom: 5px; /* 각 메뉴 간격 조정 */
+            list-style: none;
+            margin-bottom: 4px; /* Reduced margin for tighter spacing */
         }
-    
+        
         #money-submenu a {
             text-decoration: none;
             color: #333;
             display: block;
-            padding: 3px; /* 내부 여백 축소 */
-            white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+            padding: 6px; /* Reduced padding for a more compact look */
+            transition: background-color 0.3s ease;
+        
+            &:hover {
+                background-color: #f2f2f2;
+                border-radius: 4px;
+            }
         }
-    
+        
         #money-link:hover #money-submenu {
             display: block;
         }
-
+                
         .center-column {
             text-align: center;
         }
@@ -89,8 +96,15 @@
             margin-right: 5px; /* 수정 버튼과의 간격 조절 */
         }
 
+        #removemoneyButton {
+            float: right;
+            margin-right: 5px; /* 삭제 버튼과의 간격 조절 */
+        }
+
+
         #addmoneyButton,
-        #editmoneyButton {
+        #editmoneyButton,
+        #removemoneyButton {
             height: 30px;
             margin-top: -50px; /* 버튼의 위치를 상단으로 조절 */
             cursor: pointer;
@@ -99,6 +113,62 @@
         th:first-child {
             text-align: center; /* 선택 텍스트 가운데 정렬합니다. */
         }
+
+        /* 추가하기와 수정하기 폼 공통 스타일 */
+        #addmoneyForm,
+        #editmoneyForm {
+            max-width: 300px;
+            margin: 20px auto;
+            padding: 15px;
+            background-color: #f4f4f4;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    
+        /* 추가하기와 수정하기 폼 내 레이블 스타일 */
+        #addmoneyForm label,
+        #editmoneyForm label {
+            display: block;
+            margin-bottom: 8px;
+        }
+    
+        /* 추가하기와 수정하기 폼 내 입력 필드 스타일 */
+        #addmoneyForm input,
+        #editmoneyForm input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    
+        /* 추가하기와 수정하기 버튼 스타일 */
+        #addmoneyForm input[type="button"],
+        #editmoneyForm input[type="button"] {
+            background-color: #4caf50;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    
+        #addmoneyForm input[type="button"]:hover,
+        #editmoneyForm input[type="button"]:hover {
+            background-color: #45a049;
+        }
+    
+        /* 수정하기 취소 버튼 스타일 */
+        #cancelEditButton {
+            background-color: #ccc;
+            color: #333;
+        }
+    
+        #cancelEditButton:hover {
+            background-color: #bbb;
+        }
+    
 
     </style>
     <title>동아리통합시스템</title>
