@@ -30,4 +30,4 @@ def calendar(request):
         message = "login please." #틀린 정보일 때 경고 메세지
         return render(request, "signIn.html", {"messg":message})
     
-    return render(request, "calendar.html")
+    return render(request, "calendar.html", {"uid": request.session['uid']})

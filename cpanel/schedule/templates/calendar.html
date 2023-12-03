@@ -9,10 +9,29 @@
 <html lang="ko">
     <head>
         <meta charset="UTF-8" />
+        <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+        <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
+        <script>
+            const firebaseConfig = {
+                apiKey: "AIzaSyCKBN_w-mQNi1B0EIvIwOghr7y5afSkIb4",
+                authDomain: "club-management-system-bc814.firebaseapp.com",
+                projectId: "club-management-system-bc814",
+                storageBucket: "club-management-system-bc814.appspot.com",
+                messagingSenderId: "99652543260",
+                appId: "1:99652543260:web:d17e2bb697763a947950d9",
+                measurementId: "G-Z5R49455MZ",    
+                databaseURL: "https://club-management-system-bc814-default-rtdb.firebaseio.com/"
+            };
+          
+            firebase.initializeApp(firebaseConfig);
+          
+            // Firestore 초기화
+            const db = firebase.firestore();
+        </script>
+          
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
-        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js" integrity="sha256-alsi6DkexWIdeVDEct5s7cnqsWgOqsh2ihuIZbU6H3I=" crossorigin="anonymous"></script>
         <title>동아리통합시스템</title>
         <style>
             #money-link {
@@ -43,7 +62,7 @@
                 display: block;
                 padding: 6px; /* Reduced padding for a more compact look */
                 transition: background-color 0.3s ease;
-            
+                
                 &:hover {
                     background-color: #f2f2f2;
                     border-radius: 4px;
@@ -58,10 +77,66 @@
                 max-width: 80%;
                 height: auto;
             }
+            
+            #calendar {
+                height: 600px;
+                width: 900px;
+                color: black:
+            }
 
-            </style>
+            #calendar a {
+                color: black; /* 부모 엘리먼트의 색상 상속 */
+            }
 
+            #container{
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+            }
+            
+            #todo_container{
+                border: 1rem solid rgba(0, 0, 0, 0.15);
+                margin: 2.3rem auto;
+                height: 500px;
+                border-radius: 50px; /* 둥글게 만들기 위한 값 */
+            }
+
+            #cur_date{
+                text-align: center;
+                color: black;
+                font-size: 30px;
+                margin: 0;
+                padding: 15px;
+            }
+
+            #todoform input{
+                text-align: center;
+                background-color: hsla(0,0%,84%,.3);
+                color: black;
+                font-size: 15px;
+                width: 400px;
+                transition:all, 0.4s;
+            }
+
+            #todolist li{
+                color: black;
+                font-size: 25px;
+                width: 350px;
+                list-style: none;
+                text-align: center;
+            }
+            #todoform{
+                text-align: center;
+            }
+
+            .selected-date {
+                background-color: #a0d3ff; /* 선택된 날짜의 배경색을 여기에 원하는 색으로 지정 */
+            }
+
+        </style>
+        
     </head>
+    
     <body>
         <header>
             <div class="logo">
@@ -88,54 +163,237 @@
                 {% else %}
                     <li><a href="/signIn/">로그인</a></li>
                 {% endif %}
-                </ul>
+            </ul>
             </nav>
         </header>
-        <div id="calendar"></div>  
+        <div id ="container">
+            <div id="calendar"></div>
+            <div id="todo_container">
+                <p id="cur_date">일정</p>
+                <form id="todoform">
+                    <input required type="text" placeholder="일정을 작성해주세요"/>
+                </form>
+                <ul id="todolist">
+                </ul>
+            </div>
+        </div>
+            
         <script>
-            function loadCalendar() {
-              
-                const calendarEl = document.getElementById('calendar');
-                const calendar = new FullCalendar.Calendar(calendarEl, {
-                    header: {
-                        left: 'prev,next today',
-                        center: 'title',
-                        right: 'month,agendaWeek,agendaDay'
-                    },
-                    defaultView: 'month',
-                    height: 500,
-                    editable: true,
-                    events: [
-                        //이 부분에서 데이터 베이스 받는것
-                        //수정하기 버튼은 추후 추가 예정 
-                        {
-                            title: '회의',
-                            start: '2023-11-20T10:00:00',
-                            end: '2023-11-20T12:00:00',
-                            backgroundColor: '#337ab7',
-                            borderColor: '#2e6da4'
-                        },
-                        {
-                            title: '세미나',
-                            start: '2023-11-25T14:00:00',
-                            end: '2023-11-25T16:00:00',
-                            backgroundColor: '#5bc0de',
-                            borderColor: '#46b8da'
+            var calendar;
+            var selectedDate;
+
+            document.addEventListener('DOMContentLoaded', function() {
+                var calendarEl = document.getElementById('calendar');
+                calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    selectable: true,
+                    events:[],
+  
+                    dateClick: function(info) {
+                        console.log("Clicked event occurs: data = " + info.dateStr);
+                        // 선택된 날짜 변경 시, 현재 선택된 날짜의 Todo 리스트를 저장
+                        saveTodoList();
+
+                        // 현재 클릭된 날짜와 선택된 날짜가 다르면 스타일 초기화
+                        if (selectedDate !== info.dateStr) {
+                            resetSelectedDateStyle();
                         }
-                    ],        
-                    events: '/get_calendar_events/',  // Django 뷰에서 일정 데이터를 동적으로 받아오는 URL
-                    eventTextColor: 'white',  // 이벤트 텍스트 색상 설정
-                    dayRender: function (info) {
-                        // 각 날짜에 날짜 텍스트를 삽입
-                        info.el.innerHTML = '<div class="date-number">' + info.dayNumberText + '</div>';
+
+                        selectedDate = info.dateStr;
+
+                        // 선택된 날짜에 스타일 적용
+                        info.dayEl.classList.add('selected-date');
+
+                        // 선택된 날짜의 Todo 리스트를 불러옴
+                        loadTodoListFromFirestore();  // 페이지 로드 시 Firestore 데이터를 가져와서 표시
                     }
                 });
-    
-                calendar.render();
-            };
+                loadTodoListFromFirestore();  // 페이지 로드 시 Firestore 데이터를 가져와서 표시
+                calendar.render()
+            });
 
-            document.addEventListener('DOMContentLoaded', loadCalendar);
+            function addEventToCalendar(event){
+                calendar.addEvent(event)
 
+            }
+            
+            function removeEventFromCalendar(id){
+                var calendarEvent = calendar.getEventById(id)
+                calendarEvent.remove()
+                resetSelectedDateStyle();
+            }
+
+            //to do 리스트 만들기
+            const todoform = document.querySelector("#todoform")
+            const todoInput = document.querySelector("#todoform input")
+            const todoList_ul = document.querySelector("#todolist")
+
+            // 각 날짜별 Todo 리스트를 관리하는 객체
+            const todoLists = {};
+
+            todoform.addEventListener("submit", handleToDoSummit)
+
+            function handleToDoSummit(parm){
+                console.log("handleToDoSummit is called");
+                parm.preventDefault()
+                const curTodo = todoInput.value
+                console.log("todoinput value: " + curTodo)
+
+                todoInput.value = ""
+
+                const todo_cur_li = document.createElement("li")
+                const todo_cur_span = document.createElement("span")
+
+                todo_cur_span.innerText = curTodo;
+
+                todo_cur_li.appendChild(todo_cur_span)
+                todoList_ul.appendChild(todo_cur_li)
+                
+                  // 캘린더에도 일정 추가
+                if (selectedDate && curTodo) {
+                    if (!todoLists[selectedDate]) {
+                        todoLists[selectedDate] = [];
+                    }
+            
+                    todoLists[selectedDate].push(curTodo);
+
+                            // FullCalendar에 일정 추가
+                    const newEvent = {
+                        title: curTodo,
+                        start: selectedDate,
+                        id: selectedDate
+                    };
+                    
+                    addEventToCalendar(newEvent);
+
+                    // 일정 추가 후에 선택된 날짜의 스타일을 초기화
+                    resetSelectedDateStyle()
+
+                }
+            }
+            // 선택된 날짜의 스타일을 초기화하는 함수
+            function resetSelectedDateStyle() {
+                const selectedDateElement = document.querySelector('.selected-date');
+                if (selectedDateElement) {
+                    selectedDateElement.classList.remove('selected-date');
+                }
+            }
+
+            // 선택된 날짜의 Todo 리스트를 저장하는 함수
+            function saveTodoList() {
+                if (selectedDate) {
+                    const currentTodoList = Array.from(todoList_ul.children).map(li => li.textContent);
+                    todoLists[selectedDate] = currentTodoList;
+                }
+            }
+
+            // 선택된 날짜의 Todo 리스트를 불러오는 함수
+            function loadTodoList() {
+                if (selectedDate && todoLists[selectedDate]) {
+                    // 이전에 선택한 날짜의 Todo 리스트를 초기화
+                    todoList_ul.innerHTML = "";
+                    todoLists[selectedDate].forEach(todo => {
+                        const todo_cur_li = document.createElement("li");
+                        const todo_cur_span = document.createElement("span");
+                        todo_cur_span.innerText = todo;
+                        todo_cur_li.appendChild(todo_cur_span);
+                        todoList_ul.appendChild(todo_cur_li);
+                    });
+                }
+                else {
+                    // 선택된 날짜에 Todo 리스트가 없다면 Todo 리스트를 초기화
+                    todoList_ul.innerHTML = "";
+                }
+            
+            }
+
+            // Firestore에 Todo 리스트 저장
+            function saveTodoListToFirestore() {
+                if (selectedDate && todoLists[selectedDate]) {
+                    db.collection('{{uid}}').doc('동아리').collection('일정').doc(selectedDate).set({
+                    todos: todoLists[selectedDate]
+                });
+                }
+            }
+            
+            // Firestore에서 Todo 리스트 불러오기
+            function loadTodoListFromFirestore() {
+                if (selectedDate) {
+                    const docRef = db.collection('{{uid}}').doc('동아리').collection('일정').doc(selectedDate)
+
+                    // Firestore의 데이터가 변경될 때 감지하는 이벤트
+                    docRef.onSnapshot((doc) => {
+                        if (doc.exists) {
+                            // Firestore에서 Todo 리스트를 불러오고 화면에 표시
+                            const todosData = doc.data();
+                            todoList_ul.innerHTML = "";
+                            todosData.todos.forEach(todo => {
+                                const todo_cur_li = document.createElement("li");
+                                const todo_cur_span = document.createElement("span");
+                                todo_cur_span.innerText = todo;
+                                todo_cur_li.appendChild(todo_cur_span);
+                                todoList_ul.appendChild(todo_cur_li);
+                            });
+
+                            // FullCalendar의 이벤트를 업데이트
+                            updateFullCalendarEvents(selectedDate, todosData.todos);
+                        } 
+                        else {
+                            // Firestore에 Todo 리스트가 없으면 화면에서 초기화
+                            todoList_ul.innerHTML = "";
+
+                            // FullCalendar의 이벤트를 업데이트 (빈 배열로)
+                            updateFullCalendarEvents(selectedDate, []);
+                        }
+                    });
+                }
+            }
+            
+
+            // FullCalendar의 이벤트를 업데이트하는 함수
+            function updateFullCalendarEvents(date, todos) {
+                // 현재 선택된 날짜의 모든 이벤트를 제거
+                calendar.getEvents().forEach((existingEvent) => {
+                    existingEvent.remove();
+                });
+
+                // 새로운 이벤트를 추가
+                todos.forEach((todo) => {
+                    const newEvent = {
+                        title: todo,
+                        start: date,
+                        id: date + '_' + todo  // 각 이벤트에 고유한 ID를 부여
+                    };
+                    calendar.addEvent(newEvent);
+                });
+            }
+            // FullCalendar의 이벤트를 업데이트하는 함수
+            function updateFullCalendarEvents(date, todos) {
+                // 현재 선택된 날짜의 모든 이벤트를 제거
+                calendar.getEvents().forEach((existingEvent) => {
+                    existingEvent.remove();
+                });
+
+                // 새로운 이벤트를 추가
+                todos.forEach((todo) => {
+                    const newEvent = {
+                        title: todo,
+                        start: date,
+                        id: date + '_' + todo  // 각 이벤트에 고유한 ID를 부여
+                    };
+                    calendar.addEvent(newEvent);
+                });
+            }
+
+            // Todo 리스트가 추가, 삭제될 때마다 Firestore에 반영
+            function updateFirestoreOnTodoChange() {
+                saveTodoListToFirestore();
+                loadTodoListFromFirestore();
+            }
+            
+            // Todo 리스트 변경 이벤트에 Firestore 업데이트 함수 연결
+            todoform.addEventListener("submit", updateFirestoreOnTodoChange);
+  
         </script>
     </body>
 </html>
