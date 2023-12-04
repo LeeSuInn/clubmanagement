@@ -133,7 +133,74 @@
                 background-color: #a0d3ff; /* 선택된 날짜의 배경색을 여기에 원하는 색으로 지정 */
             }
 
-        </style>
+            #container {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                padding: 20px; /* 여백 추가 */
+            }
+            
+            #todo_container {
+                position: relative;
+                width: 380px; /* 투두 컨테이너 너비 지정 */
+                background-color: #f5f5f5; /* 배경색 지정 */
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+            
+            #delete-events-btn {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                padding: 10px;
+                background-color: #ff6464; /* 버튼 배경색 지정 */
+                color: #fff; /* 버튼 텍스트 색상 지정 */
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+            
+            #cur_date {
+                text-align: center;
+                font-size: 24px;
+                margin-bottom: 10px;
+            }
+            
+            #todoform input {
+                width: 100%;
+                padding: 5px;
+                margin-bottom: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+            
+            #todolist {
+                list-style: none;
+                padding: 0;
+            }
+            
+            #todolist li {
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                margin-bottom: 8px;
+                padding: 10px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 17px; /* 원하는 크기로 조정 */
+
+            }
+            
+            #todolist button {
+                background-color: #ff6464;
+                color: #fff;
+                border: none;
+                padding: 5px;
+                border-radius: 3px;
+                cursor: pointer;
+            }
+                    </style>
         
     </head>
     
@@ -170,6 +237,7 @@
             <div id="calendar"></div>
             <div id="todo_container">
                 <p id="cur_date">일정</p>
+                <button id="delete-events-btn">일정 삭제</button>
                 <form id="todoform">
                     <input required type="text" placeholder="일정을 작성해주세요"/>
                 </form>
@@ -206,6 +274,18 @@
                         loadTodoListFromFirestore(selectedDate);  // 페이지 로드 시 Firestore 데이터를 가져와서 표시
                     }
                 });
+                // "일정 삭제" 버튼에 대한 이벤트 리스너 추가
+                const deleteEventsBtn = document.getElementById('delete-events-btn');
+
+                // 버튼 엘리먼트가 DOM에서 찾아지는지 확인합니다.
+                if (deleteEventsBtn) {
+                    // 찾아진 경우, 클릭 이벤트 리스너를 추가합니다.
+                    deleteEventsBtn.addEventListener('click', deleteEventsForSelectedDate);
+                } else {
+                    // 찾아지지 않은 경우, 콘솔에 경고 메시지를 기록합니다.
+                    console.warn('일정 삭제 버튼을 찾을 수 없습니다. 버튼의 ID가 올바르게 설정되었는지 확인하세요.');
+                }
+
                 loadAllTodoListsFromFirestore()
                 calendar.render()
             });
@@ -371,6 +451,37 @@
                     calendar.addEvent(newEvent);
                 });
             }
+
+            // Function to delete events for the selected date from Firestore
+            function deleteEventsForSelectedDate() {
+                if (selectedDate) {
+                    const docRef = db.collection('{{uid}}').doc('동아리').collection('일정').doc(selectedDate);
+
+                    docRef.delete().then(() => {
+                        console.log(`Events for ${selectedDate} deleted successfully.`);
+                        
+                        // Remove events from FullCalendar
+                        calendar.getEvents().forEach((existingEvent) => {
+                            if (existingEvent.startStr.startsWith(selectedDate)) {
+                                existingEvent.remove();
+                            }
+                        });
+
+                        // Reset selectedDate style
+                        resetSelectedDateStyle();
+
+                        // Clear Todo list
+                        todoList_ul.innerHTML = "";
+
+                        // Update todoLists
+                        delete todoLists[selectedDate];
+
+                    }).catch((error) => {
+                        console.error(`Error deleting events for ${selectedDate}:`, error);
+                    });
+                }
+            }
+
         </script>
     </body>
 </html>
