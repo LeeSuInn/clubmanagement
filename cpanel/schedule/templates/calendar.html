@@ -200,7 +200,22 @@
                 border-radius: 3px;
                 cursor: pointer;
             }
-                    </style>
+
+            #todolist li {
+                display: flex;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+
+            .todo-checkbox {
+                margin-right: 10px;
+            }
+
+            .todo-text {
+                margin-right: 10px; /* 텍스트와 체크박스 간격 조절 */
+            }
+            
+        </style>
         
     </head>
     
@@ -307,10 +322,14 @@
                 todoInput.value = "";
             
                 const todo_cur_li = document.createElement("li");
+                const checkbox = document.createElement("input");
                 const todo_cur_span = document.createElement("span");
-            
+
+                checkbox.type = "checkbox";
+                checkbox.className = "todo-checkbox";
                 todo_cur_span.innerText = curTodo;
             
+                todo_cur_li.appendChild(checkbox);
                 todo_cur_li.appendChild(todo_cur_span);
                 todoList_ul.appendChild(todo_cur_li);
             
@@ -369,11 +388,19 @@
                         if (doc.exists) {
                             // Firestore에서 Todo 리스트를 불러오고 화면에 표시
                             const todosData = doc.data();
+                            const todoList_ul = document.getElementById('todolist');
                             todoList_ul.innerHTML = "";
+
                             todosData.todos.forEach(todo => {
                                 const todo_cur_li = document.createElement("li");
+                                const checkbox = document.createElement("input");
                                 const todo_cur_span = document.createElement("span");
+                                
+                                checkbox.type = "checkbox";
+                                checkbox.className = "todo-checkbox";    
                                 todo_cur_span.innerText = todo;
+
+                                todo_cur_li.appendChild(checkbox);
                                 todo_cur_li.appendChild(todo_cur_span);
                                 todoList_ul.appendChild(todo_cur_li);
                             });
@@ -454,34 +481,30 @@
 
             // Function to delete events for the selected date from Firestore
             function deleteEventsForSelectedDate() {
-                if (selectedDate) {
-                    const docRef = db.collection('{{uid}}').doc('동아리').collection('일정').doc(selectedDate);
+                const checkedCheckboxes = document.querySelectorAll("#todolist li input.todo-checkbox:checked");
 
-                    docRef.delete().then(() => {
-                        console.log(`Events for ${selectedDate} deleted successfully.`);
-                        
-                        // Remove events from FullCalendar
-                        calendar.getEvents().forEach((existingEvent) => {
-                            if (existingEvent.startStr.startsWith(selectedDate)) {
-                                existingEvent.remove();
-                            }
-                        });
-
-                        // Reset selectedDate style
-                        resetSelectedDateStyle();
-
-                        // Clear Todo list
-                        todoList_ul.innerHTML = "";
-
-                        // Update todoLists
-                        delete todoLists[selectedDate];
-
-                    }).catch((error) => {
-                        console.error(`Error deleting events for ${selectedDate}:`, error);
-                    });
-                }
+                checkedCheckboxes.forEach((checkbox) => {
+                    const todoItem = checkbox.closest("li");
+                    const todoText = todoItem.querySelector("span").innerText;
+            
+                    // 선택된 날짜와 Todo를 Todo 리스트에서 제거
+                    const todoIndex = todoLists[selectedDate].indexOf(todoText);
+                    if (todoIndex !== -1) {
+                        todoLists[selectedDate].splice(todoIndex, 1);
+                    }
+            
+                    // FullCalendar에서 이벤트 업데이트
+                    updateFullCalendarEvents(selectedDate, todoLists[selectedDate]);
+            
+                    // 화면에서 선택된 Todo 삭제
+                    todoItem.remove();
+                });
+            
+                // Firestore에 변경된 Todo 리스트 저장
+                saveTodoListToFirestore();
+                loadAllTodoListsFromFirestore();
             }
-
+                        
         </script>
     </body>
 </html>
