@@ -285,7 +285,7 @@
                     const docRef = db.collection('{{uid}}').doc('동아리').collection('일정').doc(date)
 
                     // Firestore의 데이터가 변경될 때 감지하는 이벤트
-                    docRef.onSnapshot((doc) => {
+                    docRef.get().then((doc) => {
                         if (doc.exists) {
                             // Firestore에서 Todo 리스트를 불러오고 화면에 표시
                             const todosData = doc.data();
@@ -304,14 +304,8 @@
                             saveTodoListToFirestore()
                             loadAllTodoListsFromFirestore()
                         } 
-                        else {
-                            // Firestore에 Todo 리스트가 없으면 화면에서 초기화
+                        else{
                             todoList_ul.innerHTML = "";
-
-                            // FullCalendar의 이벤트를 업데이트 (빈 배열로)
-                            updateFullCalendarEvents(selectedDate, []);
-                            todoLists[selectedDate] = [];
-
                         }
                     });
                 }
@@ -359,6 +353,7 @@
                     console.error("Error getting documents: ", error);
                 });
             }
+            
             // FullCalendar의 이벤트를 업데이트하는 함수
             function updateFullCalendarEvents(date, todos) {
                 // 현재 선택된 날짜의 모든 이벤트를 제거
