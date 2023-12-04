@@ -191,8 +191,6 @@
   
                     dateClick: function(info) {
                         console.log("Clicked event occurs: data = " + info.dateStr);
-                        // 선택된 날짜 변경 시, 현재 선택된 날짜의 Todo 리스트를 저장
-                        saveTodoList();
 
                         // 현재 클릭된 날짜와 선택된 날짜가 다르면 스타일 초기화
                         if (selectedDate !== info.dateStr) {
@@ -205,24 +203,13 @@
                         info.dayEl.classList.add('selected-date');
 
                         // 선택된 날짜의 Todo 리스트를 불러옴
-                        loadTodoListFromFirestore();  // 페이지 로드 시 Firestore 데이터를 가져와서 표시
+                        loadTodoListFromFirestore(selectedDate);  // 페이지 로드 시 Firestore 데이터를 가져와서 표시
                     }
                 });
-                loadTodoListFromFirestore();  // 페이지 로드 시 Firestore 데이터를 가져와서 표시
+                loadAllTodoListsFromFirestore()
                 calendar.render()
             });
-
-            function addEventToCalendar(event){
-                calendar.addEvent(event)
-
-            }
             
-            function removeEventFromCalendar(id){
-                var calendarEvent = calendar.getEventById(id)
-                calendarEvent.remove()
-                resetSelectedDateStyle();
-            }
-
             //to do 리스트 만들기
             const todoform = document.querySelector("#todoform")
             const todoInput = document.querySelector("#todoform input")
@@ -231,80 +218,56 @@
             // 각 날짜별 Todo 리스트를 관리하는 객체
             const todoLists = {};
 
-            todoform.addEventListener("submit", handleToDoSummit)
-
-            function handleToDoSummit(parm){
-                console.log("handleToDoSummit is called");
-                parm.preventDefault()
-                const curTodo = todoInput.value
-                console.log("todoinput value: " + curTodo)
-
-                todoInput.value = ""
-
-                const todo_cur_li = document.createElement("li")
-                const todo_cur_span = document.createElement("span")
-
+            function handleFormSubmit(event) {
+                event.preventDefault();
+            
+                const curTodo = todoInput.value;
+                console.log("todoinput value: " + curTodo);
+            
+                todoInput.value = "";
+            
+                const todo_cur_li = document.createElement("li");
+                const todo_cur_span = document.createElement("span");
+            
                 todo_cur_span.innerText = curTodo;
-
-                todo_cur_li.appendChild(todo_cur_span)
-                todoList_ul.appendChild(todo_cur_li)
-                
-                  // 캘린더에도 일정 추가
+            
+                todo_cur_li.appendChild(todo_cur_span);
+                todoList_ul.appendChild(todo_cur_li);
+            
+                // 캘린더에도 일정 추가
                 if (selectedDate && curTodo) {
                     if (!todoLists[selectedDate]) {
                         todoLists[selectedDate] = [];
                     }
             
                     todoLists[selectedDate].push(curTodo);
-
-                            // FullCalendar에 일정 추가
+            
+                    // FullCalendar에 일정 추가
                     const newEvent = {
                         title: curTodo,
                         start: selectedDate,
-                        id: selectedDate
+                        id: selectedDate,
                     };
-                    
-                    addEventToCalendar(newEvent);
-
+            
+                    calendar.addEvent(newEvent)
+            
                     // 일정 추가 후에 선택된 날짜의 스타일을 초기화
-                    resetSelectedDateStyle()
-
+                    resetSelectedDateStyle();
                 }
+            
+                // Update Firestore
+                saveTodoListToFirestore();
             }
+            
+            // Add a single event listener for the form submission
+            todoform.addEventListener("submit", handleFormSubmit);
+            
             // 선택된 날짜의 스타일을 초기화하는 함수
             function resetSelectedDateStyle() {
                 const selectedDateElement = document.querySelector('.selected-date');
                 if (selectedDateElement) {
                     selectedDateElement.classList.remove('selected-date');
                 }
-            }
-
-            // 선택된 날짜의 Todo 리스트를 저장하는 함수
-            function saveTodoList() {
-                if (selectedDate) {
-                    const currentTodoList = Array.from(todoList_ul.children).map(li => li.textContent);
-                    todoLists[selectedDate] = currentTodoList;
-                }
-            }
-
-            // 선택된 날짜의 Todo 리스트를 불러오는 함수
-            function loadTodoList() {
-                if (selectedDate && todoLists[selectedDate]) {
-                    // 이전에 선택한 날짜의 Todo 리스트를 초기화
-                    todoList_ul.innerHTML = "";
-                    todoLists[selectedDate].forEach(todo => {
-                        const todo_cur_li = document.createElement("li");
-                        const todo_cur_span = document.createElement("span");
-                        todo_cur_span.innerText = todo;
-                        todo_cur_li.appendChild(todo_cur_span);
-                        todoList_ul.appendChild(todo_cur_li);
-                    });
-                }
-                else {
-                    // 선택된 날짜에 Todo 리스트가 없다면 Todo 리스트를 초기화
-                    todoList_ul.innerHTML = "";
-                }
-            
             }
 
             // Firestore에 Todo 리스트 저장
@@ -317,9 +280,9 @@
             }
             
             // Firestore에서 Todo 리스트 불러오기
-            function loadTodoListFromFirestore() {
+            function loadTodoListFromFirestore(date) {
                 if (selectedDate) {
-                    const docRef = db.collection('{{uid}}').doc('동아리').collection('일정').doc(selectedDate)
+                    const docRef = db.collection('{{uid}}').doc('동아리').collection('일정').doc(date)
 
                     // Firestore의 데이터가 변경될 때 감지하는 이벤트
                     docRef.onSnapshot((doc) => {
@@ -337,6 +300,9 @@
 
                             // FullCalendar의 이벤트를 업데이트
                             updateFullCalendarEvents(selectedDate, todosData.todos);
+                            todoLists[selectedDate] = todosData.todos;
+                            saveTodoListToFirestore()
+                            loadAllTodoListsFromFirestore()
                         } 
                         else {
                             // Firestore에 Todo 리스트가 없으면 화면에서 초기화
@@ -344,27 +310,54 @@
 
                             // FullCalendar의 이벤트를 업데이트 (빈 배열로)
                             updateFullCalendarEvents(selectedDate, []);
+                            todoLists[selectedDate] = [];
+                            loadAllTodoListsFromFirestore()
+
                         }
                     });
                 }
             }
-            
 
-            // FullCalendar의 이벤트를 업데이트하는 함수
-            function updateFullCalendarEvents(date, todos) {
-                // 현재 선택된 날짜의 모든 이벤트를 제거
-                calendar.getEvents().forEach((existingEvent) => {
-                    existingEvent.remove();
-                });
+            // Firestore에서 모든 Todo 리스트 불러오기
+            function loadAllTodoListsFromFirestore() {
+                // '동아리/일정' 컬렉션에서 모든 문서 가져오기
+                db.collection('{{uid}}').doc('동아리').collection('일정').get().then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        // 각 문서의 데이터를 가져와서 달력에 표시
+                        const date = doc.id;
+                        const todosData = doc.data();
+                        const todos = todosData.todos;
 
-                // 새로운 이벤트를 추가
-                todos.forEach((todo) => {
-                    const newEvent = {
-                        title: todo,
-                        start: date,
-                        id: date + '_' + todo  // 각 이벤트에 고유한 ID를 부여
-                    };
-                    calendar.addEvent(newEvent);
+                        // 선택된 날짜가 있을 때와 없을 때를 구분하여 처리
+                        if (selectedDate) {
+                            // 선택된 날짜가 있는 경우
+                            if (date !== selectedDate) {
+                                // 선택된 날짜와 동일한 경우에만 FullCalendar에 이벤트 추가
+                                todos.forEach((todo) => {
+                                    const newEvent = {
+                                        title: todo,
+                                        start: date,
+                                        id: date + '_' + todo  // 각 이벤트에 고유한 ID를 부여
+                                    };
+                                    calendar.addEvent(newEvent)
+                                });
+                            }
+                        } else {
+                            // 선택된 날짜가 없는 경우 모든 날짜의 이벤트를 추가
+                            todos.forEach((todo) => {
+                                const newEvent = {
+                                    title: todo,
+                                    start: date,
+                                    id: date + '_' + todo  // 각 이벤트에 고유한 ID를 부여
+                                };
+                                calendar.addEvent(newEvent)
+                            });
+                        }
+                    // todoLists 객체 업데이트
+                    todoLists[date] = todos;
+                    });
+                }).catch((error) => {
+                    console.error("Error getting documents: ", error);
                 });
             }
             // FullCalendar의 이벤트를 업데이트하는 함수
@@ -384,16 +377,6 @@
                     calendar.addEvent(newEvent);
                 });
             }
-
-            // Todo 리스트가 추가, 삭제될 때마다 Firestore에 반영
-            function updateFirestoreOnTodoChange() {
-                saveTodoListToFirestore();
-                loadTodoListFromFirestore();
-            }
-            
-            // Todo 리스트 변경 이벤트에 Firestore 업데이트 함수 연결
-            todoform.addEventListener("submit", updateFirestoreOnTodoChange);
-  
         </script>
     </body>
 </html>
