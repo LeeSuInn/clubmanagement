@@ -258,6 +258,9 @@
         function displayData(data) {
             var tbody = document.getElementById('dataBody');
             var lastBalance = null;
+            var totalDeposit = 0;
+            var totalWithdrawal = 0;
+        
 
             // 표에 있는 기존 데이터를 지웁니다.
             tbody.innerHTML = '';
@@ -280,6 +283,14 @@
 
                 // 현재 행의 잔액 정보를 기록
                 lastBalance = parseFloat(data['잔액']);
+
+                // 총 입금과 출금을 누적
+                if (financial['입/출금'] === '입금') {
+                    totalDeposit += transactionAmount;
+                } else if (financial['입/출금'] === '출금') {
+                    totalWithdrawal += transactionAmount;
+                }
+
             });
 
             //일단 주석처리(팀원한테 물어보고 결정)
@@ -301,7 +312,7 @@
                 var balanceCell = document.createElement('td');
                 balanceCell.colSpan = 5; // 잔액 열이 4개의 열을 합침
                 balanceCell.className = 'center-column';
-                balanceCell.textContent = `회비 잔액: ${lastBalance}`;
+                balanceCell.textContent = `총 입금: ${totalDeposit}  |  총 출금: ${totalWithdrawal}  |  회비 잔액: ${lastBalance}`;
                 balanceRow.appendChild(balanceCell);
                 tbody.appendChild(balanceRow);
             }
