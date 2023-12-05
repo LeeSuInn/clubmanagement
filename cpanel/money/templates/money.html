@@ -26,12 +26,6 @@
         th {
             background-color: #f2f2f2;
         }
-        #editButton {
-            float: right;
-            margin-top: -50px;
-            margin-right: 20px; 
-            cursor: pointer;
-        }
 
         #money-link {
             position: relative;
@@ -45,7 +39,7 @@
             background-color: #fff;
             border: 1px solid #ccc;
             padding: 6px; /* Reduced padding for a more compact look */
-            width: 150px; /* Adjusted width for better readability */
+            width: 165px; /* Adjusted width for better readability */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
         }
@@ -79,35 +73,15 @@
         #button-container {
             display: flex;
             justify-content: flex-end; /* 버튼을 오른쪽으로 정렬  */
+            margin-top: -50px; /* 버튼의 위치를 상단으로 조절 */
+            margin-bottom: 20px; /* Add margin here */
+
         }
 
         #button-container button {
-            width: 80px; /* 버튼의 너비를 조정 */
-            height: 30px; /* 버튼의 높이를 조정 */
-        }
-
-        #addmoneyButton {
-            float: right;
-            margin-right: 5px;/* 추가 버튼과의 간격 조절 */
-        }
-
-        #editmoneyButton {
-            float: right;
-            margin-right: 5px; /* 수정 버튼과의 간격 조절 */
-        }
-
-        #removemoneyButton {
-            float: right;
-            margin-right: 5px; /* 삭제 버튼과의 간격 조절 */
-        }
-
-
-        #addmoneyButton,
-        #editmoneyButton,
-        #removemoneyButton {
-            height: 30px;
-            margin-top: -50px; /* 버튼의 위치를 상단으로 조절 */
-            cursor: pointer;
+        width: 80px; /* 버튼의 너비를 조정 */
+        height: 30px; /* 버튼의 높이를 조정 */
+        margin-right: 5px; /* 우측 마진을 추가하여 버튼 간격 설정 */
         }
 
         th:first-child {

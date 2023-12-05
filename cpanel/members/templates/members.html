@@ -29,34 +29,15 @@
             #button-container {
                 display: flex;
                 justify-content: flex-end; /* 버튼을 오른쪽으로 정렬  */
+                margin-top: -50px; /* 버튼의 위치를 상단으로 조절 */
+
             }
 
             #button-container button {
                 width: 80px; /* 버튼의 너비를 조정 */
                 height: 30px; /* 버튼의 높이를 조정 */
-            }
+                margin-right: 5px; /* 우측 마진을 추가하여 버튼 간격 설정 */
 
-            #addmemberButton,
-            #editmemberButton,
-            #deletememberButton {
-                height: 30px;
-                margin-top: -50px; /* 버튼의 위치를 상단으로 조절 */
-                cursor: pointer;
-            }
-
-            #addmemberButton {
-                float: right;
-                margin-right: 5px;/* 추가 버튼과의 간격 조절 */
-            }
-
-            #editmemberButton {
-                float: right;
-                margin-right: 5px; /* 수정 버튼과의 간격 조절 */
-            }
-
-            #deletememberButton {
-                float: right;
-                margin-right: 5px; /* 삭제 버튼과의 간격 조절 */
             }
 
             th:first-child {
@@ -75,7 +56,7 @@
                 background-color: #fff;
                 border: 1px solid #ccc;
                 padding: 6px; /* Reduced padding for a more compact look */
-                width: 150px; /* Adjusted width for better readability */
+                width: 165px; /* Adjusted width for better readability */
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
                 border-radius: 8px;
             }
@@ -161,6 +142,27 @@
                 max-width: 80%;
                 height: auto;
             }
+
+            #search-container {
+                margin-bottom: 20px;
+            }
+            
+            #search-input {
+                display: none; /* 초기에는 숨김 */
+                padding: 8px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                margin-right: 10px;
+                font-size: 14px;
+                float: right;
+                margin-bottom: 8px;
+                margin-top: 8px;
+            }
+                
+            #search-button {
+                float: right;
+                margin-right: 5px;/* 추가 버튼과의 간격 조절 */
+            }        
         </style>
         <title>동아리통합시스템</title>
     </head>
@@ -200,8 +202,12 @@
         <button id="addmemberButton" onclick="toggleFormVisibility()">추가하기</button>
         <button id="editmemberButton" onclick="toggleEditFormVisibility()">수정하기</button>
         <button id="deletememberButton" onclick="deleteSelectedMembers()">선택 삭제</button>
+        <button id="search-button" onclick="toggleSearchInput()">검색하기</button>
     </div>
-
+    <div id="search-container">
+        <input type="text" id="search-input" oninput="searchMembers()" placeholder="이름 또는 학번으로 검색">
+    </div>
+    
 
         <tbody>
             <!-- 테이블의 내용이 동적으로 추가될 부분 -->
@@ -499,6 +505,34 @@
                 moneyLink.addEventListener('mouseout', function() {
                     moneySubmenu.style.display = 'none';
                 });
+
+                function searchMembers() {
+                    // 검색어 가져오기
+                    var searchInput = document.getElementById('search-input').value.toUpperCase();
+
+                    // 테이블의 각 행에 대해 반복
+                    var tableRows = document.querySelectorAll('#data-body tr');
+                    tableRows.forEach(row => {
+                        // 학번 및 이름 셀의 내용 가져오기
+                        var 학번 = row.querySelector('td:nth-child(2)').textContent.toUpperCase();
+                        var 이름 = row.querySelector('td:nth-child(3)'  ).textContent.toUpperCase();
+
+                        // 검색어와 학번 또는 이름을 비교하여 표시 여부 결정
+                        if (학번.includes(searchInput) || 이름.includes(searchInput)) {
+                            row.style.display = '';  // 보이기
+                        } else {
+                            row.style.display = 'none';  // 숨기기
+                        }
+                    });
+                }
+                                
+                function toggleSearchInput() {
+                    var searchInput = document.getElementById('search-input');
+                    searchInput.style.display = searchInput.style.display === 'none' ? 'inline-block' : 'none';
+                    searchInput.value = ''; // 입력값 초기화
+                    searchMembers(); // 검색창 토글시 검색 함수 호출
+                }
+                
             </script>
             {% endif %}
 
