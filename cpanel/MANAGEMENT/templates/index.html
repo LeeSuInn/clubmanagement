@@ -51,31 +51,54 @@
                 max-width: 80%;
                 height: auto;
             }
+
+            .container {
+                max-width: 800px;
+                margin: 50px auto;
+                padding: 20px;
+                background-color: #fff;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                border-radius: 10px;
+                text-align: center;
+            }
+    
+            h2 {
+                color: #333;
+            }
+    
+            h3 {
+                color: #1a73e8;
+            }
+    
+            p {
+                color: #555;
+            }
+    
             </style>
 
-        <title>동아리통합시스템</title>
+        <title>동아리 통합 시스템</title>
     </head>
     <body>
         <header>
             <div class="logo">
                 <img src="{% static 'jpeg/logo2.jpeg' %}" alt="로고">
             </div>
-                        <nav>
+            <nav>
                 <ul>
                 {% if request.session.uid %}
-                    <li><a href="/your_view/">동아리통합시스템</a></li>
+                    <li><a href="/your_view/">동아리 통합 시스템</a></li>
                 {% else %}
-                    <li><a href="/index/">동아리통합시스템</a></li>
+                    <li><a href="/index/">동아리 통합 시스템</a></li>
                 {% endif %}
-                    <li><a href="/members/">부원관리</a></li>
+                    <li><a href="/members/">부원 관리</a></li>
                     <li id="money-link">
-                        <a href="/cash_page/">회비관리</a>
+                        <a href="/cash_page/">회비 관리</a>
                         <ul class="submenu" id="money-submenu">
                             <li><a href="/cash_page/">회비 내역</a></li>
                             <li><a href="/pay_dues_list/">회비 납부 목록</a></li>
                         </ul>
                     </li>
-                    <li><a href="/calendar/">일정관리</a></li>
+                    <li><a href="/calendar/">일정 관리</a></li>
                 {% if request.session.uid %}
                     <li><a href="/logout/">로그아웃</a></li>
                 {% else %}
@@ -84,11 +107,32 @@
                 </ul>
             </nav>
         </header>
+        
         <main>
             {% if request.session.uid %}
             <h2>{{CLUBNAME}}입니다</h2>
             {% else %}
-            <h2>중앙동아리 연합회입니다.</h2>
+            <div class="container">
+                <h2>중앙동아리 연합회에서 제공하는 동아리 관리 시스템입니다.</h2>
+                <div>
+                    <h3>부원 관리</h3>
+                    <p>
+                        동아리 부원의 정보를 한번에 볼 수 있습니다. 또한 추가, 삭제, 수정에 용이하고 검색 기능을 통해 원하는 부원의 정보를 확인할 수 있습니다.
+                    </p>
+        
+                    <h3>회비 관리</h3>
+                    <p>
+                        남은 회비의 총량을 볼 수 있게 하고, 회비를 낸 사람과 안 낸 사람의 현황을 확인할 수 있습니다. 회비의 사용 내역을 추가하거나 수정할 수 있고 임원들은 이를 투명하게 관리할 수 있습니다.                
+                    </p>
+
+                    <h3>일정 관리</h3>
+                    <p>
+                        날짜를 선택하여 일정을 작성하면, 캘린더로 자동으로 볼 수 있습니다. 일정 추가도 가능하고, 캘린더를 통해 직관적으로 일정을 다 볼 수 있습니다. 일정을 삭제할 수도 있습니다.
+                    </p>
+                    
+                    <!-- 추가적인 기능 소개를 원하는 만큼 작성하세요. -->
+                </div>
+            </div>
             {% endif %}
 
         </main>

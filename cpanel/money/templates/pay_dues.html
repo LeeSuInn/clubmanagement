@@ -104,7 +104,7 @@
 
             </style>
 
-        <title>동아리통합시스템</title>
+    <title>동아리 통합 시스템</title>
     </head>
     <body>
         <header>
@@ -114,19 +114,19 @@
             <nav>
                 <ul>
                 {% if request.session.uid %}
-                    <li><a href="/your_view/">동아리통합시스템</a></li>
+                    <li><a href="/your_view/">동아리 통합 시스템</a></li>
                 {% else %}
-                    <li><a href="/index/">동아리통합시스템</a></li>
+                    <li><a href="/index/">동아리 통합 시스템</a></li>
                 {% endif %}
-                    <li><a href="/members/">부원관리</a></li>
+                    <li><a href="/members/">부원 관리</a></li>
                     <li id="money-link">
-                        <a href="/cash_page/">회비관리</a>
+                        <a href="/cash_page/">회비 관리</a>
                         <ul class="submenu" id="money-submenu">
                             <li><a href="/cash_page/">회비 내역</a></li>
                             <li><a href="/pay_dues_list/">회비 납부 목록</a></li>
                         </ul>
                     </li>
-                    <li><a href="/calendar/">일정관리</a></li>
+                    <li><a href="/calendar/">일정 관리</a></li>
                 {% if request.session.uid %}
                     <li><a href="/logout/">로그아웃</a></li>
                 {% else %}
