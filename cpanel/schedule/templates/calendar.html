@@ -483,6 +483,13 @@
             function deleteEventsForSelectedDate() {
                 const checkedCheckboxes = document.querySelectorAll("#todolist li input.todo-checkbox:checked");
 
+                 // Check if any checkboxes are checked
+                if (checkedCheckboxes.length === 0) {
+                    alert("삭제할 일정을 선택해주세요.");
+                    return;
+                }
+
+
                 checkedCheckboxes.forEach((checkbox) => {
                     const todoItem = checkbox.closest("li");
                     const todoText = todoItem.querySelector("span").innerText;
