@@ -255,15 +255,14 @@
                 })   
             }
             
-        function displayData(data) {
-            var tbody = document.getElementById('dataBody');
-            var lastBalance = null;
-            var totalDeposit = 0;
-            var totalWithdrawal = 0;
-        
-
-            // 표에 있는 기존 데이터를 지웁니다.
-            tbody.innerHTML = '';
+            function displayData(data) {
+                var tbody = document.getElementById('dataBody');
+                var lastBalance = null;
+                var totalDeposit = 0;
+                var totalWithdrawal = 0;
+                 
+                // 표에 있는 기존 데이터를 지웁니다.
+                tbody.innerHTML = '';
 
             data['회비 내역'].forEach(financial => {
                 // 입/출금과 잔액을 숫자로 변환
@@ -423,7 +422,7 @@
                     
                     var editForm = document.getElementById('editmoneyForm');
                     editForm.style.display = 'none';
-
+                    
                     // 멤버 목록 새로고침
                     fetchData();  // 수정 후에 데이터 다시 가져와서 화면 갱신
         

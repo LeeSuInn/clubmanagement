@@ -140,11 +140,16 @@ def edit_money(request):
                     '사유': data['사유'],
                     '금액': int(data['금액']),
                 })
-
-                if data['입출금'] == "입금":
-                    dues = dues + int(data['금액']) - int(data['selectedRowData']['금액'])
+                if data['selectedRowData']['입출금'] == "입금":
+                    if data['입출금'] == "입금":
+                        dues = dues + int(data['금액']) - int(data['selectedRowData']['금액'])
+                    else:
+                        dues = dues - int(data['금액']) - int(data['selectedRowData']['금액'])
                 else:
-                    dues = dues - int(data['금액']) - int(data['selectedRowData']['금액'])
+                    if data['입출금'] == "입금":
+                        dues = dues + int(data['금액']) + int(data['selectedRowData']['금액'])
+                    else:
+                        dues = dues - int(data['금액']) + int(data['selectedRowData']['금액'])
             dues_ref.update({'잔액': dues})
 
             return JsonResponse({'status': 'success', 'message': '멤버 정보가 성공적으로 수정되었습니다.'})
