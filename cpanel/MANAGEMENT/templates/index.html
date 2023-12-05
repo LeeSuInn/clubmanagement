@@ -109,9 +109,6 @@
         </header>
         
         <main>
-            {% if request.session.uid %}
-            <h2>{{CLUBNAME}}입니다</h2>
-            {% else %}
             <div class="container">
                 <h2>중앙동아리 연합회에서 제공하는 동아리 관리 시스템입니다.</h2>
                 <div>
@@ -133,10 +130,7 @@
                     <!-- 추가적인 기능 소개를 원하는 만큼 작성하세요. -->
                 </div>
             </div>
-            {% endif %}
-
         </main>
-
         <footer>
         </footer>
     </body>
