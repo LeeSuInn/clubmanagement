@@ -293,19 +293,6 @@
 
             });
 
-            //일단 주석처리(팀원한테 물어보고 결정)
-            {% comment %} // 모든 행을 추가한 이후에 잔액 열을 첫 번째 행으로 추가하고 중앙 정렬 
-            if (lastBalance !== null) {
-                var firstRow = document.createElement('tr');
-                var balanceCell = document.createElement('td');
-                balanceCell.colSpan = 4; // 잔액 열이 4개의 열을 합침
-                balanceCell.className = 'center-column';
-                balanceCell.textContent = `회비 잔액: ${lastBalance}`;
-                firstRow.appendChild(balanceCell);
-                tbody.insertBefore(firstRow, tbody.firstChild);
-            }
-            {% endcomment %}
-
             // 모든 행을 추가한 이후에 한 번만 잔액 열을 추가하고 중앙 정렬
             if (lastBalance !== null) {
                 var balanceRow = document.createElement('tr');
