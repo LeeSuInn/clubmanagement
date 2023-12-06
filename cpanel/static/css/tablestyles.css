@@ -1,0 +1,42 @@
+/*데이터 테이블*/
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    border: 1px solid #dddddd;
+    text-align: center;
+    padding: 8px;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+/*추가, 수정, 삭제, 검색 기능 버튼*/
+#button-container {
+    display: flex;
+    justify-content: flex-end; /* 버튼을 오른쪽으로 정렬  */
+    margin-top: -50px; /* 버튼의 위치를 상단으로 조절 */
+    margin-bottom: 20px; /* Add margin here */
+
+}
+
+#button-container button {
+width: 80px; /* 버튼의 너비를 조정 */
+height: 30px; /* 버튼의 높이를 조정 */
+margin-right: 5px; /* 우측 마진을 추가하여 버튼 간격 설정 */
+}
+
+#search-input {
+    display: none; /* 초기에는 숨김 */
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+    font-size: 14px;
+    float: right;
+    margin-bottom: 8px;
+}
+

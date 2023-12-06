@@ -1,0 +1,54 @@
+/* 추가하기와 수정하기 폼 공통 스타일 */
+#addMemberForm,
+#editMemberForm {
+    max-width: 300px;
+    margin: 20px auto;
+    padding: 15px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 추가하기와 수정하기 폼 내 레이블 스타일 */
+#addMemberForm label,
+#editMemberForm label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+/* 추가하기와 수정하기 폼 내 입력 필드 스타일 */
+#addMemberForm input,
+#editMemberForm input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* 추가하기와 수정하기 버튼 스타일 */
+#addMemberForm input[type="button"],
+#editMemberForm input[type="button"] {
+    background-color: #4caf50;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#addMemberForm input[type="button"]:hover,
+#editMemberForm input[type="button"]:hover {
+    background-color: #45a049;
+}
+
+/* 수정하기 취소 버튼 스타일 */
+#cancelEditButton {
+    background-color: #ccc;
+    color: #333;
+}
+
+#cancelEditButton:hover {
+    background-color: #bbb;
+}

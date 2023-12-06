@@ -15,14 +15,6 @@
         <link rel="stylesheet" href="{% static 'css/moneyformstyles.css' %}" />
         <style>                        
             #search-input {
-                display: none; /* 초기에는 숨김 */
-                padding: 8px;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                margin-right: 10px;
-                font-size: 14px;
-                float: right;
-                margin-bottom: 8px;
                 width: 220px;
             }  
         </style>
@@ -63,6 +55,7 @@
     <div id="button-container">
         <button id="addmoneyButton" onclick="toggleFormVisibility()">추가하기</button>
         <button id="editmoneyButton" onclick="toggleEditFormVisibility()">수정하기</button>
+        <button id="removemoneyButton" onclick="deleteSelectedRows()">삭제하기</button>
         <button id="search-button" onclick="toggleSearchInput()">검색하기</button>
     </div>
     <div id="search-container">

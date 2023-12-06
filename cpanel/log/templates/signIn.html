@@ -10,113 +10,9 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+        <link rel="stylesheet" href="{% static 'css/loginstyles.css' %}" />
         <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js" integrity="sha256-alsi6DkexWIdeVDEct5s7cnqsWgOqsh2ihuIZbU6H3I=" crossorigin="anonymous"></script>
-        <style>
-            #money-link {
-                position: relative;
-            }
-            
-            #money-submenu {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                background-color: #fff;
-                border: 1px solid #ccc;
-                padding: 6px; /* Reduced padding for a more compact look */
-                width: 165px; /* Adjusted width for better readability */
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                border-radius: 8px;
-            }
-            
-            #money-submenu li {
-                list-style: none;
-                margin-bottom: 4px; /* Reduced margin for tighter spacing */
-            }
-            
-            #money-submenu a {
-                text-decoration: none;
-                color: #333;
-                display: block;
-                padding: 6px; /* Reduced padding for a more compact look */
-                transition: background-color 0.3s ease;
-            
-                &:hover {
-                    background-color: #f2f2f2;
-                    border-radius: 4px;
-                }
-            }
-            
-            #money-link:hover #money-submenu {
-                display: block;
-            }
-
-            body {
-                font-family: 'Arial', sans-serif;
-                background-color: #f2f2f2;
-                margin: 0;
-                padding: 0;
-            }
-    
-            header {
-                background-color: #333;
-                padding: 20px;
-                color: white;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-    
-            .logo img {
-                max-width: 80%;
-                height: auto;
-            }
-    
-            nav ul {
-                list-style: none;
-                display: flex;
-            }
-    
-            nav ul li {
-                margin-right: 20px;
-            }
-    
-            main {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                margin-top: -190px;
-            }
-    
-            form {
-                background-color: white;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                width: 300px;
-            }
-    
-            form input {
-                width: 100%;
-                padding: 4px;
-                margin-bottom: 10px;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-            }
-    
-            form input[type="submit"] {
-                background-color: #333;
-                color: white;
-                cursor: pointer;
-            }
-    
-            form input[type="submit"]:hover {
-                background-color: #555;
-            }
-    
-            </style>
 
         <title>로그인</title>    
     </head>
@@ -161,9 +57,6 @@
             </form>
             
         </main>
-
-        <footer>
-        </footer>
         <script>
             var modal = document.getElementById('myModal');
             var loginBtn = document.getElementById('loginBtn');            

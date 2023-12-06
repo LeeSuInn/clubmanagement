@@ -1,9 +1,3 @@
-body {
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-}
-
 header {
     background-color: #333;
     color: #fff;
@@ -13,6 +7,13 @@ header {
     align-items: center;
 }
 
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/*기능 목록*/
 nav ul {
     list-style-type: none;
     display: flex;
@@ -28,74 +29,48 @@ a {
     font-size: 20px;
 }
 
-main {
-    padding: 20px;
+/*로고 사진*/
+.logo img {
+    max-width: 80%;
+    height: auto;
 }
 
-footer {
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    padding: 10px;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
+/*회비 관리 서브 메뉴 스타일*/
+#money-link {
+    position: relative;
 }
 
-/* 모달 전체 스타일 */
-.modal {
+#money-submenu {
     display: none;
-    position: fixed;
-    z-index: 1;
+    position: absolute;
+    top: 100%;
     left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 6px; 
+    width: 165px; 
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
 }
 
-/* 모달 내용 스타일 */
-.modal-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
+#money-submenu li {
+    list-style: none;
+    margin-bottom: 4px; 
 }
 
-/* 닫기 버튼 스타일 */
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-    color: black;
+#money-submenu a {
     text-decoration: none;
-    cursor: pointer;
+    color: #333;
+    display: block;
+    padding: 6px; 
+    transition: background-color 0.3s ease;
+
+    &:hover {
+        background-color: #f2f2f2;
+        border-radius: 4px;
+    }
 }
 
-/* styles.css */
-
-/* style.css */
-
-#calendar {
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-
-.fc-event-container {
-    background-color: #337ab7; 
-    border-color: #2e6da4; 
-}
-
-
-.fc-event {
-    background-color: #337ab7;
-    border-color: #2e6da4; 
+#money-link:hover #money-submenu {
+    display: block;
 }
