@@ -11,143 +11,22 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
-    <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        th, td {
-            border: 1px solid #dddddd;
-            text-align: left;
-            padding: 8px;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        #money-link {
-            position: relative;
-        }
-        
-        #money-submenu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            padding: 6px; /* Reduced padding for a more compact look */
-            width: 165px; /* Adjusted width for better readability */
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-        
-        #money-submenu li {
-            list-style: none;
-            margin-bottom: 4px; /* Reduced margin for tighter spacing */
-        }
-        
-        #money-submenu a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 6px; /* Reduced padding for a more compact look */
-            transition: background-color 0.3s ease;
-        
-            &:hover {
-                background-color: #f2f2f2;
+        <link rel="stylesheet" href="{% static 'css/tablestyles.css' %}" />
+        <link rel="stylesheet" href="{% static 'css/moneyformstyles.css' %}" />
+        <style>                        
+            #search-input {
+                display: none; /* 초기에는 숨김 */
+                padding: 8px;
+                border: 1px solid #ccc;
                 border-radius: 4px;
-            }
-        }
-        
-        #money-link:hover #money-submenu {
-            display: block;
-        }
-                
-        .center-column {
-            text-align: center;
-        }
+                margin-right: 10px;
+                font-size: 14px;
+                float: right;
+                margin-bottom: 8px;
+                width: 220px;
+            }  
+        </style>
 
-        #button-container {
-            display: flex;
-            justify-content: flex-end; /* 버튼을 오른쪽으로 정렬  */
-            margin-top: -50px; /* 버튼의 위치를 상단으로 조절 */
-            margin-bottom: 20px; /* Add margin here */
-
-        }
-
-        #button-container button {
-        width: 80px; /* 버튼의 너비를 조정 */
-        height: 30px; /* 버튼의 높이를 조정 */
-        margin-right: 5px; /* 우측 마진을 추가하여 버튼 간격 설정 */
-        }
-
-        th:first-child {
-            text-align: center; /* 선택 텍스트 가운데 정렬합니다. */
-        }
-
-        /* 추가하기와 수정하기 폼 공통 스타일 */
-        #addmoneyForm,
-        #editmoneyForm {
-            max-width: 300px;
-            margin: 20px auto;
-            padding: 15px;
-            background-color: #f4f4f4;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-    
-        /* 추가하기와 수정하기 폼 내 레이블 스타일 */
-        #addmoneyForm label,
-        #editmoneyForm label {
-            display: block;
-            margin-bottom: 8px;
-        }
-    
-        /* 추가하기와 수정하기 폼 내 입력 필드 스타일 */
-        #addmoneyForm input,
-        #editmoneyForm input {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 12px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-    
-        /* 추가하기와 수정하기 버튼 스타일 */
-        #addmoneyForm input[type="button"],
-        #editmoneyForm input[type="button"] {
-            background-color: #4caf50;
-            color: white;
-            padding: 8px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-    
-        #addmoneyForm input[type="button"]:hover,
-        #editmoneyForm input[type="button"]:hover {
-            background-color: #45a049;
-        }
-    
-        /* 수정하기 취소 버튼 스타일 */
-        #cancelEditButton {
-            background-color: #ccc;
-            color: #333;
-        }
-    
-        #cancelEditButton:hover {
-            background-color: #bbb;
-        }
-        
-        .logo img {
-            max-width: 80%;
-            height: auto;
-        }
-    </style>
     <title>동아리 통합 시스템</title>
 </head>
 <body>
@@ -184,7 +63,10 @@
     <div id="button-container">
         <button id="addmoneyButton" onclick="toggleFormVisibility()">추가하기</button>
         <button id="editmoneyButton" onclick="toggleEditFormVisibility()">수정하기</button>
-        <button id="removemoneyButton" onclick="deleteSelectedRows()">삭제하기</button>
+        <button id="search-button" onclick="toggleSearchInput()">검색하기</button>
+    </div>
+    <div id="search-container">
+        <input type="text" id="search-input" oninput="searchmoneys()" placeholder="입/출금 또는 날짜 또는 사유로 검색">
     </div>
 
     <table id="moneyTable">
@@ -518,6 +400,41 @@
             document.getElementById('edit_사유').value = '';
             document.getElementById('edit_금액').value = '';
         }
+
+        function searchmoneys() {
+            // 검색어 가져오기
+            var searchInput = document.getElementById('search-input').value.toUpperCase();
+
+            // 테이블의 각 행에 대해 반복
+            var tableRows = document.querySelectorAll('#moneyTable tbody tr');
+            tableRows.forEach(row => {
+                // 입/출금, 날짜, 사유 셀의 내용 가져오기
+                var 입출금Cell = row.querySelector('td:nth-child(2)');
+                var 날짜Cell = row.querySelector('td:nth-child(3)');
+                var 사유Cell = row.querySelector('td:nth-child(4)');
+                
+                // 셀이 찾아진 경우에만 textContent에 접근하도록 변경
+                var 입출금 = 입출금Cell ? 입출금Cell.textContent.toUpperCase() : '';
+                var 날짜 = 날짜Cell ? 날짜Cell.textContent.toUpperCase() : '';
+                var 사유 = 사유Cell ? 사유Cell.textContent.toUpperCase() : '';
+
+
+                // 검색어와 각 셀의 내용을 비교하여 표시 여부 결정
+                if (입출금.includes(searchInput) || 날짜.includes(searchInput) || 사유.includes(searchInput)) {
+                    row.style.display = '';  // 보이기
+                } else {
+                    row.style.display = 'none';  // 숨기기
+                }
+            });
+        }
+
+        function toggleSearchInput() {
+            var searchInput = document.getElementById('search-input');
+            searchInput.style.display = searchInput.style.display === 'none' ? 'inline-block' : 'none';
+            searchInput.value = ''; // 입력값 초기화
+            searchmoneys(); // 검색창 토글시 검색 함수 호출
+        }
+
 
     </script>
 </body>
