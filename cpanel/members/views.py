@@ -116,7 +116,7 @@ def delete_members(request):
             pay_dues_doc_ref = pay_dues_collection_ref.document(학번) 
             pay_dues_doc_ref.delete()
 
-        return JsonResponse({'status': 'success', 'message': '선택한 부원들을 성공적으로 삭제하였습니다.'})
+        return JsonResponse({'status': 'success', 'message': '선택한 부원을 성공적으로 삭제하였습니다.'})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)})
 

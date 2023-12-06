@@ -11,6 +11,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
         <link rel="stylesheet" href="{% static 'css/loginstyles.css' %}" />
+
         <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js" integrity="sha256-alsi6DkexWIdeVDEct5s7cnqsWgOqsh2ihuIZbU6H3I=" crossorigin="anonymous"></script>
 
@@ -47,50 +48,17 @@
             </nav>
         </header>
         <main>
+            <!-- 입력 받은 아이디, 비밀번호 데이터로 postsign 함수 실행 -->
             <form action="/postsign/" method="post">
                 {% csrf_token %}
                 아이디:
-                <input type="email" name="email"><br><br>
+                <input type="email" name="email">
                 비밀번호:
-                <input type="password" name="pass"><br><br>
+                <input type="password" name="pass">
                 <input type="submit" value="로그인">
             </form>
             
         </main>
-        <script>
-            var modal = document.getElementById('myModal');
-            var loginBtn = document.getElementById('loginBtn');            
-            var closeBtn = document.getElementsByClassName('close')[0];
-            loginBtn.onclick = function () {
-                modal.style.display = 'block';
-            };
-
-            // 모달 닫기 버튼 클릭 시 모달 숨김
-            closeBtn.onclick = function () {
-                modal.style.display = 'none';
-            };
-
-            
-            window.onclick = function (event) {
-                if (event.target == modal) {
-                    modal.style.display = 'none';
-                }
-            };
-
-            //밑에서 id, password 확인 예정 
-            var loginForm = document.getElementById('loginForm');
-            loginForm.addEventListener('submit', function (event) {
-                event.preventDefault();
-                var username = document.getElementById('username').value;
-                var password = document.getElementById('password').value;
-                console.log('Username:', username, 'Password:', password);
-               
-                modal.style.display = 'none';  
-            });
-
-            <script src="{% static 'jquery-3.7.1.min.js' %}" integrity="sha256-..." crossorigin="anonymous"></script>
-            <script src="{% static 'fullcalendar@6.1.9/index.global.min.js' %}" integrity="sha256-..." crossorigin="anonymous"></script>
-
-        </script>
+        <script src="{% static 'js/login.js' %}" defer></script>
     </body>
 </html>
