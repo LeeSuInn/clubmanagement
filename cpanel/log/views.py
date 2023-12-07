@@ -23,7 +23,6 @@ firebase = pyrebase.initialize_app(config)
 authe = firebase.auth()
 database = firebase.database()
 
-# Create your views here.
 def signIn(request):
     return render(request, "signIn.html")
 

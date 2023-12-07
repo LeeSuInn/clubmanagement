@@ -75,7 +75,8 @@
 
 
         <script>
-            const csrfToken = "{{ csrf_token }}";
+            const csrfToken = "{{ csrf_token }}"; // Django에서 전달받은 csrf_token 변수(schedule.js에서 사용)
+        </script>    
         </script>
         <script src="{% static 'js/displaypaydues.js' %}" defer></script>
         <script src="{% static 'js/editpaydues.js' %}" defer></script>

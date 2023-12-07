@@ -37,7 +37,7 @@
     border-radius: 4px;
     cursor: pointer;
 }
-
+/*추가하기와 수정하기 호버 스타일*/
 #addmoneyForm input[type="button"]:hover,
 #editmoneyForm input[type="button"]:hover {
     background-color: #45a049;

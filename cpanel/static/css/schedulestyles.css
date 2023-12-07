@@ -8,6 +8,7 @@
     color: black; /* 부모 엘리먼트의 색상 상속 */
 }
 
+/*달력과 일정 리스트 스타일*/
 #container{
     display: flex;
     flex-direction: row;
@@ -17,21 +18,30 @@
 
 }
 
+/*일정 리스트 스타일*/
 #todo_container{
+    position: relative;    
+    width: 380px; /* 투두 컨테이너 너비 지정 */
+    background-color: #f5f5f5; /* 배경색 지정 */
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border: 1rem solid rgba(0, 0, 0, 0.15);
     margin: 2.3rem auto;
     height: 420px;
     border-radius: 50px; /* 둥글게 만들기 위한 값 */
 }
 
+/*최근에 선택한 날짜 스타일*/
 #cur_date{
     text-align: center;
     color: black;
     font-size: 30px;
     margin: 0;
     padding: 15px;
+    margin-bottom: 10px;
 }
 
+/*입력 폼*/
 #todoform input{
     text-align: center;
     background-color: hsla(0,0%,84%,.3);
@@ -39,11 +49,24 @@
     font-size: 15px;
     width: 400px;
     transition:all, 0.4s;
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
+/*list 스타일*/
 #todolist li{
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     color: black;
-    font-size: 25px;
+    font-size: 17px;
     width: 350px;
     list-style: none;
     text-align: center;
@@ -56,21 +79,6 @@
     background-color: #a0d3ff; /* 선택된 날짜의 배경색을 여기에 원하는 색으로 지정 */
 }
 
-#container {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 20px; /* 여백 추가 */
-}
-
-#todo_container {
-    position: relative;
-    width: 380px; /* 투두 컨테이너 너비 지정 */
-    background-color: #f5f5f5; /* 배경색 지정 */
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
 
 #delete-events-btn {
     position: absolute;
@@ -84,35 +92,10 @@
     cursor: pointer;
 }
 
-#cur_date {
-    text-align: center;
-    font-size: 24px;
-    margin-bottom: 10px;
-}
-
-#todoform input {
-    width: 100%;
-    padding: 5px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
 
 #todolist {
     list-style: none;
     padding: 0;
-}
-
-#todolist li {
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 8px;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 17px; /* 원하는 크기로 조정 */
-
 }
 
 #todolist button {

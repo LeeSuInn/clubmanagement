@@ -1,10 +1,5 @@
-from django.shortcuts import render, HttpResponseRedirect
-from django.urls import reverse
+from django.shortcuts import render
 import pyrebase
-from django.contrib import auth
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
-
 
 #firebase 프로젝트 정보
 config ={

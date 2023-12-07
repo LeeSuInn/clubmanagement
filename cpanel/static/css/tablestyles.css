@@ -19,8 +19,7 @@ th {
     display: flex;
     justify-content: flex-end; /* 버튼을 오른쪽으로 정렬  */
     margin-top: -50px; /* 버튼의 위치를 상단으로 조절 */
-    margin-bottom: 20px; /* Add margin here */
-
+    margin-bottom: 20px;
 }
 
 #button-container button {
